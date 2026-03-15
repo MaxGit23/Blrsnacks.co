@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ordersApi, productsApi, inventoryApi, usersApi, type Order, type InventoryRecord } from '@/lib/api';
-import { Card, Badge, Skeleton } from '@/components/ui';
+import { Card, Badge } from '@/components/ui';
 import { formatPrice, formatDate } from '@/lib/format';
 
 const statusVariant: Record<string, 'default' | 'success' | 'warning' | 'error' | 'info' | 'brand'> = {
@@ -14,68 +13,50 @@ const statusVariant: Record<string, 'default' | 'success' | 'warning' | 'error' 
     CANCELLED: 'error',
 };
 
-interface DashboardStats {
-    totalOrders: number;
-    totalRevenue: number;
-    totalProducts: number;
-    totalCustomers: number;
-    pendingOrders: number;
-}
+/* ── Demo data (remove when backend is connected) ──────────────────────── */
+const DEMO_ORDERS = [
+    { id: 'ord-a1b2c3d4', status: 'PENDING' as const, totalAmount: 549, createdAt: '2026-02-26T10:30:00Z', user: { email: 'priya@gmail.com' } },
+    { id: 'ord-e5f6g7h8', status: 'CONFIRMED' as const, totalAmount: 1299, createdAt: '2026-02-26T09:15:00Z', user: { email: 'rahul@outlook.com' } },
+    { id: 'ord-i9j0k1l2', status: 'SHIPPED' as const, totalAmount: 780, createdAt: '2026-02-25T18:45:00Z', user: { email: 'meena@yahoo.com' } },
+    { id: 'ord-m3n4o5p6', status: 'DELIVERED' as const, totalAmount: 2150, createdAt: '2026-02-25T14:00:00Z', user: { email: 'karthik@gmail.com' } },
+    { id: 'ord-q7r8s9t0', status: 'PENDING' as const, totalAmount: 430, createdAt: '2026-02-25T12:30:00Z', user: { email: 'deepa@gmail.com' } },
+];
+
+const DEMO_LOW_STOCK = [
+    { id: 'inv-1', productId: 'p1', stock: 5, reservedStock: 3, product: { name: 'Classic Banana Chips (200g)', price: 149, images: [] } },
+    { id: 'inv-2', productId: 'p2', stock: 0, reservedStock: 0, product: { name: 'Spicy Mixture (500g)', price: 299, images: [] } },
+    { id: 'inv-3', productId: 'p3', stock: 8, reservedStock: 2, product: { name: 'Butter Murukku (250g)', price: 179, images: [] } },
+    { id: 'inv-4', productId: 'p4', stock: 3, reservedStock: 1, product: { name: 'Mysore Pak (12 pcs)', price: 349, images: [] } },
+];
+
+const DEMO_STATS = {
+    totalOrders: 156,
+    totalRevenue: 85430,
+    totalProducts: 48,
+    totalCustomers: 312,
+    pendingOrders: 12,
+};
+/* ────────────────────────────────────────────────────────────────────────── */
 
 export default function AdminDashboardPage() {
-    const [stats, setStats] = useState<DashboardStats | null>(null);
-    const [recentOrders, setRecentOrders] = useState<Order[]>([]);
-    const [lowStock, setLowStock] = useState<InventoryRecord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const load = async () => {
-            try {
-                const [ordersRes, productsRes, usersRes, lowStockRes] = await Promise.allSettled([
-                    ordersApi.getAll({ limit: 5 }),
-                    productsApi.getAll({ limit: 1 }),
-                    usersApi.getAll({ limit: 1 }),
-                    inventoryApi.getLowStock(15),
-                ]);
-
-                const orders = ordersRes.status === 'fulfilled' ? ordersRes.value : null;
-                const products = productsRes.status === 'fulfilled' ? productsRes.value : null;
-                const users = usersRes.status === 'fulfilled' ? usersRes.value : null;
-                const lowStockData = lowStockRes.status === 'fulfilled' ? lowStockRes.value : [];
-
-                setRecentOrders(orders?.data ?? []);
-                setLowStock(Array.isArray(lowStockData) ? lowStockData : []);
-
-                const allOrders = orders?.data ?? [];
-                const pendingCount = allOrders.filter(o => o.status === 'PENDING').length;
-                const revenue = allOrders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
-
-                setStats({
-                    totalOrders: orders?.meta?.total ?? allOrders.length,
-                    totalRevenue: revenue,
-                    totalProducts: products?.meta?.total ?? 0,
-                    totalCustomers: users?.meta?.total ?? 0,
-                    pendingOrders: pendingCount,
-                });
-            } catch {
-                /* noop — individual failures handled by Promise.allSettled */
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        load();
+        // Simulate loading
+        const timer = setTimeout(() => setIsLoading(false), 600);
+        return () => clearTimeout(timer);
     }, []);
 
     if (isLoading) {
         return (
             <div className="p-6 md:p-8">
-                <Skeleton className="h-8 w-48 mb-6" />
+                <div className="h-8 w-48 mb-6 bg-bg-secondary rounded animate-pulse" />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-28 rounded-[var(--radius-lg)]" />)}
+                    {[1, 2, 3, 4].map((i) => <div key={i} className="h-28 rounded-[var(--radius-lg)] bg-bg-secondary animate-pulse" />)}
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Skeleton className="h-80 rounded-[var(--radius-lg)]" />
-                    <Skeleton className="h-80 rounded-[var(--radius-lg)]" />
+                    <div className="h-80 rounded-[var(--radius-lg)] bg-bg-secondary animate-pulse" />
+                    <div className="h-80 rounded-[var(--radius-lg)] bg-bg-secondary animate-pulse" />
                 </div>
             </div>
         );
@@ -91,10 +72,10 @@ export default function AdminDashboardPage() {
             {/* ─── Stats Grid ──────────────────────────────────────────────── */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
-                    { label: 'Total Orders', value: stats?.totalOrders ?? 0, icon: '🧾', href: '/admin/orders' },
-                    { label: 'Revenue', value: formatPrice(stats?.totalRevenue ?? 0), icon: '💰', href: '/admin/orders' },
-                    { label: 'Products', value: stats?.totalProducts ?? 0, icon: '🍌', href: '/admin/products' },
-                    { label: 'Customers', value: stats?.totalCustomers ?? 0, icon: '👥', href: '/admin/customers' },
+                    { label: 'Total Orders', value: DEMO_STATS.totalOrders, icon: '🧾', href: '/admin/orders' },
+                    { label: 'Revenue', value: formatPrice(DEMO_STATS.totalRevenue), icon: '💰', href: '/admin/orders' },
+                    { label: 'Products', value: DEMO_STATS.totalProducts, icon: '🍌', href: '/admin/products' },
+                    { label: 'Customers', value: DEMO_STATS.totalCustomers, icon: '👥', href: '/admin/customers' },
                 ].map(({ label, value, icon, href }) => (
                     <Link key={label} href={href}>
                         <Card hoverable className="h-full">
@@ -110,10 +91,10 @@ export default function AdminDashboardPage() {
                 ))}
             </div>
 
-            {stats?.pendingOrders !== undefined && stats.pendingOrders > 0 && (
+            {DEMO_STATS.pendingOrders > 0 && (
                 <div className="mb-6 px-4 py-3 bg-warning-light text-warning rounded-[var(--radius-md)] text-sm font-medium flex items-center gap-2">
                     <span>⚠️</span>
-                    {stats.pendingOrders} order{stats.pendingOrders !== 1 ? 's' : ''} awaiting confirmation
+                    {DEMO_STATS.pendingOrders} order{DEMO_STATS.pendingOrders !== 1 ? 's' : ''} awaiting confirmation
                     <Link href="/admin/orders?status=PENDING" className="ml-auto underline hover:no-underline">
                         Review now →
                     </Link>
@@ -129,28 +110,24 @@ export default function AdminDashboardPage() {
                             View all →
                         </Link>
                     </div>
-                    {recentOrders.length === 0 ? (
-                        <p className="text-sm text-text-tertiary text-center py-6">No orders yet</p>
-                    ) : (
-                        <div className="space-y-3">
-                            {recentOrders.slice(0, 5).map((order) => (
-                                <Link
-                                    key={order.id}
-                                    href={`/admin/orders`}
-                                    className="flex items-center justify-between p-3 rounded-[var(--radius-md)] hover:bg-bg-secondary transition-colors"
-                                >
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <span className="text-xs font-mono text-text-tertiary">#{order.id.slice(0, 6).toUpperCase()}</span>
-                                        <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
-                                    </div>
-                                    <div className="flex items-center gap-3 shrink-0">
-                                        <span className="text-xs text-text-tertiary">{formatDate(order.createdAt)}</span>
-                                        <span className="text-sm font-semibold text-text-primary">{formatPrice(Number(order.totalAmount))}</span>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                    <div className="space-y-3">
+                        {DEMO_ORDERS.map((order) => (
+                            <Link
+                                key={order.id}
+                                href={`/admin/orders`}
+                                className="flex items-center justify-between p-3 rounded-[var(--radius-md)] hover:bg-bg-secondary transition-colors"
+                            >
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <span className="text-xs font-mono text-text-tertiary">#{order.id.slice(4, 10).toUpperCase()}</span>
+                                    <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
+                                </div>
+                                <div className="flex items-center gap-3 shrink-0">
+                                    <span className="text-xs text-text-tertiary">{formatDate(order.createdAt)}</span>
+                                    <span className="text-sm font-semibold text-text-primary">{formatPrice(order.totalAmount)}</span>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 </Card>
 
                 {/* ─── Low Stock Alerts ──────────────────────────────────────── */}
@@ -161,34 +138,27 @@ export default function AdminDashboardPage() {
                             Manage inventory →
                         </Link>
                     </div>
-                    {lowStock.length === 0 ? (
-                        <div className="flex flex-col items-center py-6">
-                            <span className="text-3xl mb-2">✅</span>
-                            <p className="text-sm text-text-tertiary">All products are well-stocked</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {lowStock.slice(0, 5).map((item) => {
-                                const available = item.stock - item.reservedStock;
-                                return (
-                                    <div
-                                        key={item.id}
-                                        className="flex items-center justify-between p-3 rounded-[var(--radius-md)] bg-bg-secondary"
-                                    >
-                                        <div className="min-w-0">
-                                            <div className="text-sm font-medium text-text-primary truncate">{item.product.name}</div>
-                                            <div className="text-xs text-text-tertiary">{formatPrice(Number(item.product.price))}</div>
-                                        </div>
-                                        <div className="shrink-0">
-                                            <Badge variant={available <= 0 ? 'error' : 'warning'}>
-                                                {available <= 0 ? 'Out of stock' : `${available} left`}
-                                            </Badge>
-                                        </div>
+                    <div className="space-y-3">
+                        {DEMO_LOW_STOCK.map((item) => {
+                            const available = item.stock - item.reservedStock;
+                            return (
+                                <div
+                                    key={item.id}
+                                    className="flex items-center justify-between p-3 rounded-[var(--radius-md)] bg-bg-secondary"
+                                >
+                                    <div className="min-w-0">
+                                        <div className="text-sm font-medium text-text-primary truncate">{item.product.name}</div>
+                                        <div className="text-xs text-text-tertiary">{formatPrice(item.product.price)}</div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                    <div className="shrink-0">
+                                        <Badge variant={available <= 0 ? 'error' : 'warning'}>
+                                            {available <= 0 ? 'Out of stock' : `${available} left`}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </Card>
             </div>
         </div>

@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { ordersApi, type Order } from '@/lib/api';
-import { Button, Badge, Card, Skeleton, Pagination, EmptyState, Modal, Select, Textarea } from '@/components/ui';
+import { useState, useEffect, Suspense } from 'react';
+import { Button, Badge, Card, Pagination, EmptyState, Modal, Select, Textarea } from '@/components/ui';
 import { useToast } from '@/components/ui/Toast';
 import { formatPrice, formatDate } from '@/lib/format';
-import { getImageUrl } from '@/lib/images';
 
 const statusVariant: Record<string, 'default' | 'success' | 'warning' | 'error' | 'info' | 'brand'> = {
     PENDING: 'warning',
@@ -24,6 +21,17 @@ const STATUS_OPTIONS = [
     { value: 'CANCELLED', label: 'Cancelled' },
 ];
 
+/* ── Demo data (remove when backend is connected) ──────────────────────── */
+const DEMO_ORDERS = [
+    { id: 'ord-a1b2c3d4e5f6', status: 'PENDING' as const, totalAmount: 549, createdAt: '2026-02-26T10:30:00Z', user: { id: 'u1', email: 'priya.sharma@gmail.com' }, address: { street: '12 MG Road', city: 'Bangalore', state: 'Karnataka', zip: '560001', country: 'IN' }, items: [{ id: 'oi1', productId: 'p1', quantity: 2, priceAtPurchase: 149, product: { id: 'p1', name: 'Classic Banana Chips', slug: 'classic-banana-chips', images: [] } }, { id: 'oi2', productId: 'p3', quantity: 1, priceAtPurchase: 179, product: { id: 'p3', name: 'Butter Murukku', slug: 'butter-murukku', images: [] } }], statusHistory: [{ id: 'sh1', status: 'PENDING', notes: null, createdBy: null, createdAt: '2026-02-26T10:30:00Z' }] },
+    { id: 'ord-e5f6g7h8i9j0', status: 'CONFIRMED' as const, totalAmount: 1299, createdAt: '2026-02-26T09:15:00Z', user: { id: 'u2', email: 'rahul.k@outlook.com' }, address: { street: '45 Koramangala', city: 'Bangalore', state: 'Karnataka', zip: '560034', country: 'IN' }, items: [{ id: 'oi3', productId: 'p6', quantity: 2, priceAtPurchase: 499, product: { id: 'p6', name: 'Cashew Mix', slug: 'cashew-mix', images: [] } }, { id: 'oi4', productId: 'p4', quantity: 1, priceAtPurchase: 349, product: { id: 'p4', name: 'Mysore Pak', slug: 'mysore-pak', images: [] } }], statusHistory: [{ id: 'sh2', status: 'PENDING', notes: null, createdBy: null, createdAt: '2026-02-26T09:00:00Z' }, { id: 'sh3', status: 'CONFIRMED', notes: 'Payment verified', createdBy: 'admin', createdAt: '2026-02-26T09:15:00Z' }] },
+    { id: 'ord-k1l2m3n4o5p6', status: 'SHIPPED' as const, totalAmount: 780, createdAt: '2026-02-25T18:45:00Z', user: { id: 'u3', email: 'meena.r@yahoo.com' }, address: { street: '78 Indiranagar', city: 'Bangalore', state: 'Karnataka', zip: '560038', country: 'IN' }, items: [{ id: 'oi5', productId: 'p5', quantity: 3, priceAtPurchase: 169, product: { id: 'p5', name: 'Pepper Banana Chips', slug: 'pepper-banana-chips', images: [] } }, { id: 'oi6', productId: 'p8', quantity: 1, priceAtPurchase: 249, product: { id: 'p8', name: 'Filter Coffee', slug: 'filter-coffee', images: [] } }], statusHistory: [{ id: 'sh4', status: 'PENDING', notes: null, createdBy: null, createdAt: '2026-02-25T18:00:00Z' }, { id: 'sh5', status: 'CONFIRMED', notes: null, createdBy: 'admin', createdAt: '2026-02-25T18:30:00Z' }, { id: 'sh6', status: 'SHIPPED', notes: 'Tracking: BLR2026X45', createdBy: 'admin', createdAt: '2026-02-25T18:45:00Z' }] },
+    { id: 'ord-q7r8s9t0u1v2', status: 'DELIVERED' as const, totalAmount: 2150, createdAt: '2026-02-25T14:00:00Z', user: { id: 'u4', email: 'karthik.n@gmail.com' }, address: { street: '22 HSR Layout', city: 'Bangalore', state: 'Karnataka', zip: '560102', country: 'IN' }, items: [{ id: 'oi7', productId: 'p9', quantity: 4, priceAtPurchase: 329, product: { id: 'p9', name: 'Salt Banana Chips', slug: 'salt-banana-chips', images: [] } }, { id: 'oi8', productId: 'p4', quantity: 2, priceAtPurchase: 349, product: { id: 'p4', name: 'Mysore Pak', slug: 'mysore-pak', images: [] } }], statusHistory: [{ id: 'sh7', status: 'DELIVERED', notes: 'Signed by customer', createdBy: 'delivery', createdAt: '2026-02-25T14:00:00Z' }] },
+    { id: 'ord-w3x4y5z6a7b8', status: 'PENDING' as const, totalAmount: 430, createdAt: '2026-02-25T12:30:00Z', user: { id: 'u5', email: 'deepa.v@gmail.com' }, address: { street: '56 Jayanagar', city: 'Bangalore', state: 'Karnataka', zip: '560041', country: 'IN' }, items: [{ id: 'oi9', productId: 'p10', quantity: 2, priceAtPurchase: 159, product: { id: 'p10', name: 'Ribbon Pakoda', slug: 'ribbon-pakoda', images: [] } }, { id: 'oi10', productId: 'p7', quantity: 1, priceAtPurchase: 129, product: { id: 'p7', name: 'Jaggery Peanut Bar', slug: 'jaggery-peanut-bar', images: [] } }], statusHistory: [{ id: 'sh8', status: 'PENDING', notes: null, createdBy: null, createdAt: '2026-02-25T12:30:00Z' }] },
+    { id: 'ord-c9d0e1f2g3h4', status: 'CANCELLED' as const, totalAmount: 598, createdAt: '2026-02-24T16:20:00Z', user: { id: 'u6', email: 'suresh.m@email.com' }, address: { street: '90 Whitefield', city: 'Bangalore', state: 'Karnataka', zip: '560066', country: 'IN' }, items: [{ id: 'oi11', productId: 'p2', quantity: 2, priceAtPurchase: 299, product: { id: 'p2', name: 'Spicy Mixture', slug: 'spicy-mixture', images: [] } }], statusHistory: [{ id: 'sh9', status: 'PENDING', notes: null, createdBy: null, createdAt: '2026-02-24T16:00:00Z' }, { id: 'sh10', status: 'CANCELLED', notes: 'Customer requested cancellation', createdBy: 'admin', createdAt: '2026-02-24T16:20:00Z' }] },
+];
+/* ────────────────────────────────────────────────────────────────────────── */
+
 export default function AdminOrdersPage() {
     return (
         <Suspense>
@@ -33,43 +41,37 @@ export default function AdminOrdersPage() {
 }
 
 function OrdersContent() {
-    const searchParams = useSearchParams();
     const { addToast } = useToast();
-    const [orders, setOrders] = useState<Order[]>([]);
+    const [orders, setOrders] = useState(DEMO_ORDERS);
     const [isLoading, setIsLoading] = useState(true);
-    const [statusFilter, setStatusFilter] = useState(searchParams.get('status') ?? '');
+    const [statusFilter, setStatusFilter] = useState('');
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const ITEMS_PER_PAGE = 10;
 
     // Status update modal
     const [showStatusModal, setShowStatusModal] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<typeof DEMO_ORDERS[0] | null>(null);
     const [newStatus, setNewStatus] = useState('');
     const [statusNotes, setStatusNotes] = useState('');
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
-    const fetchOrders = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const res = await ordersApi.getAll({
-                status: statusFilter || undefined,
-                page,
-                limit: 10,
-            });
-            setOrders(res.data);
-            setTotalPages(res.meta?.totalPages ?? 1);
-        } catch {
-            setOrders([]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [statusFilter, page]);
-
     useEffect(() => {
-        fetchOrders();
-    }, [fetchOrders]);
+        setIsLoading(true);
+        const timer = setTimeout(() => {
+            let filtered = [...DEMO_ORDERS];
+            if (statusFilter) {
+                filtered = filtered.filter(o => o.status === statusFilter);
+            }
+            setOrders(filtered);
+            setIsLoading(false);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [statusFilter]);
 
-    const openStatusUpdate = (order: Order) => {
+    const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+    const paginatedOrders = orders.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+    const openStatusUpdate = (order: typeof DEMO_ORDERS[0]) => {
         setSelectedOrder(order);
         setNewStatus(order.status);
         setStatusNotes('');
@@ -79,16 +81,10 @@ function OrdersContent() {
     const handleStatusUpdate = async () => {
         if (!selectedOrder || !newStatus) return;
         setUpdatingStatus(true);
-        try {
-            await ordersApi.updateStatus(selectedOrder.id, newStatus, statusNotes || undefined);
-            addToast(`Order #${selectedOrder.id.slice(0, 6).toUpperCase()} updated to ${newStatus}`, 'success');
-            setShowStatusModal(false);
-            fetchOrders();
-        } catch {
-            addToast('Failed to update order status', 'error');
-        } finally {
-            setUpdatingStatus(false);
-        }
+        await new Promise(r => setTimeout(r, 800));
+        addToast(`Order #${selectedOrder.id.slice(4, 10).toUpperCase()} updated to ${newStatus} (demo)`, 'success');
+        setShowStatusModal(false);
+        setUpdatingStatus(false);
     };
 
     return (
@@ -107,8 +103,8 @@ function OrdersContent() {
                         id={`admin-filter-${value || 'all'}`}
                         onClick={() => { setStatusFilter(value); setPage(1); }}
                         className={`px-3 py-1.5 text-xs font-medium rounded-[var(--radius-full)] border transition-all ${statusFilter === value
-                                ? 'bg-brand-primary text-white border-brand-primary'
-                                : 'bg-white text-text-secondary border-border-default hover:border-brand-primary/30'
+                            ? 'bg-brand-primary text-white border-brand-primary'
+                            : 'bg-white text-text-secondary border-border-default hover:border-brand-primary/30'
                             }`}
                     >
                         {label}
@@ -119,9 +115,9 @@ function OrdersContent() {
             {/* Orders */}
             {isLoading ? (
                 <div className="space-y-3">
-                    {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-24 rounded-[var(--radius-lg)]" />)}
+                    {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-24 rounded-[var(--radius-lg)] bg-bg-secondary animate-pulse" />)}
                 </div>
-            ) : orders.length === 0 ? (
+            ) : paginatedOrders.length === 0 ? (
                 <EmptyState
                     icon="🧾"
                     title="No orders found"
@@ -144,10 +140,10 @@ function OrdersContent() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {orders.map((order) => (
+                                {paginatedOrders.map((order) => (
                                     <tr key={order.id} className="border-b border-border-light hover:bg-bg-secondary/50 transition-colors">
                                         <td className="py-3 px-4">
-                                            <span className="text-xs font-mono text-text-primary font-medium">#{order.id.slice(0, 8).toUpperCase()}</span>
+                                            <span className="text-xs font-mono text-text-primary font-medium">#{order.id.slice(4, 12).toUpperCase()}</span>
                                         </td>
                                         <td className="py-3 px-4">
                                             <div className="text-sm text-text-primary">{order.user?.email ?? '—'}</div>
@@ -156,12 +152,8 @@ function OrdersContent() {
                                         <td className="py-3 px-4">
                                             <div className="flex -space-x-2">
                                                 {order.items.slice(0, 3).map((item) => (
-                                                    <div key={item.id} className="w-8 h-8 rounded-full border-2 border-white bg-bg-secondary overflow-hidden">
-                                                        {item.product.images?.length > 0 ? (
-                                                            <img src={getImageUrl(item.product.images[0])} alt="" className="w-full h-full object-cover" loading="lazy" />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-[10px]">📦</div>
-                                                        )}
+                                                    <div key={item.id} className="w-8 h-8 rounded-full border-2 border-white bg-bg-secondary overflow-hidden flex items-center justify-center text-[10px]">
+                                                        📦
                                                     </div>
                                                 ))}
                                                 {order.items.length > 3 && (
@@ -171,7 +163,7 @@ function OrdersContent() {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4 text-right font-semibold text-text-primary">{formatPrice(Number(order.totalAmount))}</td>
+                                        <td className="py-3 px-4 text-right font-semibold text-text-primary">{formatPrice(order.totalAmount)}</td>
                                         <td className="py-3 px-4 text-center">
                                             <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
                                         </td>
@@ -189,15 +181,15 @@ function OrdersContent() {
 
                     {/* Mobile cards */}
                     <div className="md:hidden space-y-3">
-                        {orders.map((order) => (
+                        {paginatedOrders.map((order) => (
                             <Card key={order.id} padding="none" className="overflow-hidden">
                                 <div className="p-4">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs font-mono text-text-primary font-medium">#{order.id.slice(0, 6).toUpperCase()}</span>
+                                            <span className="text-xs font-mono text-text-primary font-medium">#{order.id.slice(4, 10).toUpperCase()}</span>
                                             <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
                                         </div>
-                                        <span className="text-sm font-bold text-text-primary">{formatPrice(Number(order.totalAmount))}</span>
+                                        <span className="text-sm font-bold text-text-primary">{formatPrice(order.totalAmount)}</span>
                                     </div>
                                     <div className="text-xs text-text-tertiary mb-3">
                                         {order.user?.email} · {formatDate(order.createdAt)}
@@ -205,17 +197,10 @@ function OrdersContent() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex -space-x-1">
                                             {order.items.slice(0, 4).map((item) => (
-                                                <div key={item.id} className="w-7 h-7 rounded-full border-2 border-white bg-bg-secondary overflow-hidden">
-                                                    {item.product.images?.length > 0 ? (
-                                                        <img src={getImageUrl(item.product.images[0])} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-[10px]">📦</div>
-                                                    )}
+                                                <div key={item.id} className="w-7 h-7 rounded-full border-2 border-white bg-bg-secondary overflow-hidden flex items-center justify-center text-[10px]">
+                                                    📦
                                                 </div>
                                             ))}
-                                            {order.items.length > 4 && (
-                                                <span className="text-[10px] text-text-tertiary ml-1">+{order.items.length - 4}</span>
-                                            )}
                                         </div>
                                         <Button variant="outline" size="sm" onClick={() => openStatusUpdate(order)}>
                                             Update Status
@@ -244,10 +229,10 @@ function OrdersContent() {
                         <div className="p-3 bg-bg-secondary rounded-[var(--radius-md)]">
                             <div className="text-xs text-text-tertiary">Order</div>
                             <div className="text-sm font-mono font-semibold text-text-primary">
-                                #{selectedOrder.id.slice(0, 8).toUpperCase()}
+                                #{selectedOrder.id.slice(4, 12).toUpperCase()}
                             </div>
                             <div className="text-xs text-text-tertiary mt-1">
-                                {selectedOrder.user?.email} · {formatPrice(Number(selectedOrder.totalAmount))}
+                                {selectedOrder.user?.email} · {formatPrice(selectedOrder.totalAmount)}
                             </div>
                         </div>
 

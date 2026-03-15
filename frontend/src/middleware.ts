@@ -10,7 +10,7 @@ import { NextResponse, type NextRequest } from 'next/server';
  */
 
 const PROTECTED_PATHS = ['/orders', '/checkout', '/account'];
-const ADMIN_PATHS = ['/admin'];
+const ADMIN_PATHS: string[] = []; // Temporarily disabled for demo — was ['/admin']
 const AUTH_PATHS = ['/login', '/register'];
 
 function isPathMatch(pathname: string, paths: string[]): boolean {

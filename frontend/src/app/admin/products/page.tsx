@@ -1,49 +1,88 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { productsApi, categoriesApi, type Product, type Category } from '@/lib/api';
-import { Button, Badge, Card, Skeleton, Pagination, EmptyState, Input, Select, Textarea, Modal } from '@/components/ui';
+import { Button, Badge, Card, Pagination, EmptyState, Input, Select, Textarea, Modal } from '@/components/ui';
 import { useToast } from '@/components/ui/Toast';
 import { formatPrice, formatDate } from '@/lib/format';
-import { getImageUrl } from '@/lib/images';
+
+/* ── Demo data types ───────────────────────────────────────────────────── */
+interface DemoProduct {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    price: number;
+    images: string[];
+    isPublished: boolean;
+    category: { id: string; name: string; slug: string };
+    inventory: { stock: number; reservedStock: number };
+    createdAt: string;
+}
+
+interface DemoCategory {
+    id: string;
+    name: string;
+    slug: string;
+}
+
+/* ── Demo data (remove when backend is connected) ──────────────────────── */
+const DEMO_CATEGORIES: DemoCategory[] = [
+    { id: 'cat-1', name: 'Banana Chips', slug: 'banana-chips' },
+    { id: 'cat-2', name: 'Mixtures', slug: 'mixtures' },
+    { id: 'cat-3', name: 'Murukku', slug: 'murukku' },
+    { id: 'cat-4', name: 'Sweets', slug: 'sweets' },
+    { id: 'cat-5', name: 'Dry Fruits', slug: 'dry-fruits' },
+    { id: 'cat-6', name: 'Beverages', slug: 'beverages' },
+];
+
+const DEMO_PRODUCTS: DemoProduct[] = [
+    { id: 'p1', name: 'Classic Banana Chips (200g)', slug: 'classic-banana-chips', description: 'Thin-sliced Kerala banana chips fried in pure coconut oil', price: 149, images: [], isPublished: true, category: DEMO_CATEGORIES[0], inventory: { stock: 5, reservedStock: 3 }, createdAt: '2026-02-20T10:00:00Z' },
+    { id: 'p2', name: 'Spicy Mixture (500g)', slug: 'spicy-mixture', description: 'A fiery blend of sev, boondi, peanuts, and curry leaves', price: 299, images: [], isPublished: true, category: DEMO_CATEGORIES[1], inventory: { stock: 0, reservedStock: 0 }, createdAt: '2026-02-19T10:00:00Z' },
+    { id: 'p3', name: 'Butter Murukku (250g)', slug: 'butter-murukku', description: 'Crispy spiral murukku made with rice flour and butter', price: 179, images: [], isPublished: true, category: DEMO_CATEGORIES[2], inventory: { stock: 45, reservedStock: 5 }, createdAt: '2026-02-18T10:00:00Z' },
+    { id: 'p4', name: 'Mysore Pak (12 pcs)', slug: 'mysore-pak', description: 'Traditional ghee-rich Mysore Pak made with besan', price: 349, images: [], isPublished: true, category: DEMO_CATEGORIES[3], inventory: { stock: 20, reservedStock: 8 }, createdAt: '2026-02-17T10:00:00Z' },
+    { id: 'p5', name: 'Pepper Banana Chips (200g)', slug: 'pepper-banana-chips', description: 'Banana chips seasoned with crushed black pepper', price: 169, images: [], isPublished: true, category: DEMO_CATEGORIES[0], inventory: { stock: 60, reservedStock: 12 }, createdAt: '2026-02-16T10:00:00Z' },
+    { id: 'p6', name: 'Cashew Mix (250g)', slug: 'cashew-mix', description: 'Premium cashews roasted with spices and curry leaves', price: 499, images: [], isPublished: true, category: DEMO_CATEGORIES[4], inventory: { stock: 30, reservedStock: 5 }, createdAt: '2026-02-15T10:00:00Z' },
+    { id: 'p7', name: 'Jaggery Peanut Bar (6 pcs)', slug: 'jaggery-peanut-bar', description: 'Crunchy peanut chikki with organic jaggery', price: 129, images: [], isPublished: false, category: DEMO_CATEGORIES[3], inventory: { stock: 100, reservedStock: 0 }, createdAt: '2026-02-14T10:00:00Z' },
+    { id: 'p8', name: 'Filter Coffee Powder (200g)', slug: 'filter-coffee-powder', description: '80:20 blend of Arabica and Robusta beans', price: 249, images: [], isPublished: true, category: DEMO_CATEGORIES[5], inventory: { stock: 35, reservedStock: 10 }, createdAt: '2026-02-13T10:00:00Z' },
+    { id: 'p9', name: 'Salt Banana Chips (500g)', slug: 'salt-banana-chips', description: 'Family pack of lightly salted banana chips', price: 329, images: [], isPublished: true, category: DEMO_CATEGORIES[0], inventory: { stock: 15, reservedStock: 3 }, createdAt: '2026-02-12T10:00:00Z' },
+    { id: 'p10', name: 'Ribbon Pakoda (250g)', slug: 'ribbon-pakoda', description: 'Thin crispy ribbon-shaped savory snack', price: 159, images: [], isPublished: true, category: DEMO_CATEGORIES[1], inventory: { stock: 40, reservedStock: 8 }, createdAt: '2026-02-11T10:00:00Z' },
+];
+/* ────────────────────────────────────────────────────────────────────────── */
 
 export default function AdminProductsPage() {
     const { addToast } = useToast();
-    const [products, setProducts] = useState<Product[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [products, setProducts] = useState<DemoProduct[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const ITEMS_PER_PAGE = 10;
 
     // Modal state
     const [showModal, setShowModal] = useState(false);
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [editingProduct, setEditingProduct] = useState<DemoProduct | null>(null);
     const [form, setForm] = useState({ name: '', description: '', price: '', categoryId: '', isPublished: true });
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
-    const fetchProducts = useCallback(async () => {
+    const fetchProducts = useCallback(() => {
         setIsLoading(true);
-        try {
-            const res = await productsApi.getAll({ search: search || undefined, page, limit: 10 });
-            setProducts(res.data);
-            setTotalPages(res.meta?.totalPages ?? 1);
-        } catch {
-            setProducts([]);
-        } finally {
+        setTimeout(() => {
+            let filtered = [...DEMO_PRODUCTS];
+            if (search) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+            }
+            setProducts(filtered);
             setIsLoading(false);
-        }
-    }, [search, page]);
-
-    useEffect(() => {
-        categoriesApi.getAll().then(setCategories).catch(() => { /* noop */ });
-    }, []);
+        }, 400);
+    }, [search]);
 
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
+
+    const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+    const paginatedProducts = products.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
     const openCreate = () => {
         setEditingProduct(null);
@@ -52,7 +91,7 @@ export default function AdminProductsPage() {
         setShowModal(true);
     };
 
-    const openEdit = (product: Product) => {
+    const openEdit = (product: DemoProduct) => {
         setEditingProduct(product);
         setForm({
             name: product.name,
@@ -77,43 +116,20 @@ export default function AdminProductsPage() {
     const handleSave = async () => {
         if (!validateForm()) return;
         setSaving(true);
-        try {
-            const payload = {
-                name: form.name.trim(),
-                description: form.description.trim(),
-                price: Number(form.price),
-                categoryId: form.categoryId,
-                isPublished: form.isPublished,
-            };
-
-            if (editingProduct) {
-                await productsApi.update(editingProduct.id, payload);
-                addToast('Product updated successfully', 'success');
-            } else {
-                await productsApi.create(payload);
-                addToast('Product created successfully', 'success');
-            }
-            setShowModal(false);
-            fetchProducts();
-        } catch {
-            addToast(`Failed to ${editingProduct ? 'update' : 'create'} product`, 'error');
-        } finally {
-            setSaving(false);
-        }
+        // Simulate save
+        await new Promise(r => setTimeout(r, 800));
+        addToast(editingProduct ? 'Product updated successfully (demo)' : 'Product created successfully (demo)', 'success');
+        setShowModal(false);
+        setSaving(false);
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
         setDeletingId(id);
-        try {
-            await productsApi.delete(id);
-            addToast('Product deleted', 'info');
-            fetchProducts();
-        } catch {
-            addToast('Failed to delete product', 'error');
-        } finally {
-            setDeletingId(null);
-        }
+        await new Promise(r => setTimeout(r, 600));
+        setProducts(prev => prev.filter(p => p.id !== id));
+        addToast('Product deleted (demo)', 'info');
+        setDeletingId(null);
     };
 
     return (
@@ -140,9 +156,9 @@ export default function AdminProductsPage() {
             {/* Product Table */}
             {isLoading ? (
                 <div className="space-y-3">
-                    {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-16 rounded-[var(--radius-md)]" />)}
+                    {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-16 rounded-[var(--radius-md)] bg-bg-secondary animate-pulse" />)}
                 </div>
-            ) : products.length === 0 ? (
+            ) : paginatedProducts.length === 0 ? (
                 <EmptyState
                     icon="🍌"
                     title="No products found"
@@ -166,20 +182,14 @@ export default function AdminProductsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {products.map((product) => {
+                                {paginatedProducts.map((product) => {
                                     const available = product.inventory ? product.inventory.stock - product.inventory.reservedStock : 0;
                                     return (
                                         <tr key={product.id} className="border-b border-border-light hover:bg-bg-secondary/50 transition-colors">
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 shrink-0 rounded-[var(--radius-md)] bg-bg-secondary overflow-hidden">
-                                                        {product.images.length > 0 ? (
-                                                            <img src={getImageUrl(product.images[0])} alt="" className="w-full h-full object-cover" loading="lazy" />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center">
-                                                                <img src="/placeholder-product.svg" alt="" className="w-5 h-5 opacity-40" />
-                                                            </div>
-                                                        )}
+                                                    <div className="w-10 h-10 shrink-0 rounded-[var(--radius-md)] bg-bg-secondary overflow-hidden flex items-center justify-center">
+                                                        <img src="/placeholder-product.svg" alt="" className="w-5 h-5 opacity-40" />
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div className="font-medium text-text-primary truncate">{product.name}</div>
@@ -188,7 +198,7 @@ export default function AdminProductsPage() {
                                                 </div>
                                             </td>
                                             <td className="py-3 px-4 text-text-secondary">{product.category?.name ?? '—'}</td>
-                                            <td className="py-3 px-4 text-right font-semibold text-text-primary">{formatPrice(Number(product.price))}</td>
+                                            <td className="py-3 px-4 text-right font-semibold text-text-primary">{formatPrice(product.price)}</td>
                                             <td className="py-3 px-4 text-center">
                                                 <Badge variant={product.isPublished ? 'success' : 'default'}>
                                                     {product.isPublished ? 'Published' : 'Draft'}
@@ -222,23 +232,17 @@ export default function AdminProductsPage() {
 
                     {/* Mobile cards */}
                     <div className="md:hidden space-y-3">
-                        {products.map((product) => {
+                        {paginatedProducts.map((product) => {
                             const available = product.inventory ? product.inventory.stock - product.inventory.reservedStock : 0;
                             return (
                                 <Card key={product.id} padding="none" className="overflow-hidden">
                                     <div className="flex gap-3 p-4">
-                                        <div className="w-14 h-14 shrink-0 rounded-[var(--radius-md)] bg-bg-secondary overflow-hidden">
-                                            {product.images.length > 0 ? (
-                                                <img src={getImageUrl(product.images[0])} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <img src="/placeholder-product.svg" alt="" className="w-6 h-6 opacity-40" />
-                                                </div>
-                                            )}
+                                        <div className="w-14 h-14 shrink-0 rounded-[var(--radius-md)] bg-bg-secondary overflow-hidden flex items-center justify-center">
+                                            <img src="/placeholder-product.svg" alt="" className="w-6 h-6 opacity-40" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-semibold text-text-primary truncate">{product.name}</div>
-                                            <div className="text-xs text-text-tertiary mt-0.5">{product.category?.name} · {formatPrice(Number(product.price))}</div>
+                                            <div className="text-xs text-text-tertiary mt-0.5">{product.category?.name} · {formatPrice(product.price)}</div>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <Badge variant={product.isPublished ? 'success' : 'default'}>
                                                     {product.isPublished ? 'Published' : 'Draft'}
@@ -313,7 +317,7 @@ export default function AdminProductsPage() {
                             error={formErrors.categoryId}
                             options={[
                                 { value: '', label: 'Select category' },
-                                ...categories.map((c) => ({ value: c.id, label: c.name })),
+                                ...DEMO_CATEGORIES.map((c) => ({ value: c.id, label: c.name })),
                             ]}
                         />
                     </div>

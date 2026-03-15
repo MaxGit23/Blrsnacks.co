@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth-context';
-import { Skeleton } from '@/components/ui';
+import { usePathname } from 'next/navigation';
+// import { useAuth } from '@/context/auth-context';
+// import { Skeleton } from '@/components/ui';
 
 const NAV_ITEMS = [
     { href: '/admin', icon: '📊', label: 'Dashboard' },
@@ -14,34 +14,18 @@ const NAV_ITEMS = [
     { href: '/admin/customers', icon: '👥', label: 'Customers' },
 ];
 
+/* ── TODO: Restore auth check before going to production ───────────────── */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const router = useRouter();
-    const { user, isAuthenticated, isLoading } = useAuth();
+    // const router = useRouter();
+    // const { user, isAuthenticated, isLoading } = useAuth();
+    const user = { email: 'admin@blrsnacks.co', role: 'ADMIN' };
 
-    useEffect(() => {
-        if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
-            router.push('/login?redirect=/admin');
-        }
-    }, [isLoading, isAuthenticated, user, router]);
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex">
-                <div className="w-64 bg-bg-secondary p-6 space-y-3">
-                    {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-10 rounded-[var(--radius-md)]" />)}
-                </div>
-                <div className="flex-1 p-8">
-                    <Skeleton className="h-8 w-48 mb-6" />
-                    <Skeleton className="h-64 rounded-[var(--radius-lg)]" />
-                </div>
-            </div>
-        );
-    }
-
-    if (!isAuthenticated || user?.role !== 'ADMIN') {
-        return null;
-    }
+    // useEffect(() => {
+    //     if (!isLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
+    //         router.push('/login?redirect=/admin');
+    //     }
+    // }, [isLoading, isAuthenticated, user, router]);
 
     const isActive = (href: string) =>
         href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
@@ -59,8 +43,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 href={href}
                                 id={`admin-nav-${label.toLowerCase()}`}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] text-sm font-medium transition-all ${isActive(href)
-                                        ? 'bg-brand-primary text-white shadow-sm'
-                                        : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+                                    ? 'bg-brand-primary text-white shadow-sm'
+                                    : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
                                     }`}
                             >
                                 <span>{icon}</span>
