@@ -4,104 +4,84 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button, Badge, Card, Pagination, EmptyState, Input, Select, Textarea, Modal } from '@/components/ui';
 import { useToast } from '@/components/ui/Toast';
 import { formatPrice, formatDate } from '@/lib/format';
-
-/* ── Demo data types ───────────────────────────────────────────────────── */
-interface DemoProduct {
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-    price: number;
-    images: string[];
-    isPublished: boolean;
-    category: { id: string; name: string; slug: string };
-    inventory: { stock: number; reservedStock: number };
-    createdAt: string;
-}
-
-interface DemoCategory {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-/* ── Demo data (remove when backend is connected) ──────────────────────── */
-const DEMO_CATEGORIES: DemoCategory[] = [
-    { id: 'cat-1', name: 'Banana Chips', slug: 'banana-chips' },
-    { id: 'cat-2', name: 'Mixtures', slug: 'mixtures' },
-    { id: 'cat-3', name: 'Murukku', slug: 'murukku' },
-    { id: 'cat-4', name: 'Sweets', slug: 'sweets' },
-    { id: 'cat-5', name: 'Dry Fruits', slug: 'dry-fruits' },
-    { id: 'cat-6', name: 'Beverages', slug: 'beverages' },
-];
-
-const DEMO_PRODUCTS: DemoProduct[] = [
-    { id: 'p1', name: 'Classic Banana Chips (200g)', slug: 'classic-banana-chips', description: 'Thin-sliced Kerala banana chips fried in pure coconut oil', price: 149, images: [], isPublished: true, category: DEMO_CATEGORIES[0], inventory: { stock: 5, reservedStock: 3 }, createdAt: '2026-02-20T10:00:00Z' },
-    { id: 'p2', name: 'Spicy Mixture (500g)', slug: 'spicy-mixture', description: 'A fiery blend of sev, boondi, peanuts, and curry leaves', price: 299, images: [], isPublished: true, category: DEMO_CATEGORIES[1], inventory: { stock: 0, reservedStock: 0 }, createdAt: '2026-02-19T10:00:00Z' },
-    { id: 'p3', name: 'Butter Murukku (250g)', slug: 'butter-murukku', description: 'Crispy spiral murukku made with rice flour and butter', price: 179, images: [], isPublished: true, category: DEMO_CATEGORIES[2], inventory: { stock: 45, reservedStock: 5 }, createdAt: '2026-02-18T10:00:00Z' },
-    { id: 'p4', name: 'Mysore Pak (12 pcs)', slug: 'mysore-pak', description: 'Traditional ghee-rich Mysore Pak made with besan', price: 349, images: [], isPublished: true, category: DEMO_CATEGORIES[3], inventory: { stock: 20, reservedStock: 8 }, createdAt: '2026-02-17T10:00:00Z' },
-    { id: 'p5', name: 'Pepper Banana Chips (200g)', slug: 'pepper-banana-chips', description: 'Banana chips seasoned with crushed black pepper', price: 169, images: [], isPublished: true, category: DEMO_CATEGORIES[0], inventory: { stock: 60, reservedStock: 12 }, createdAt: '2026-02-16T10:00:00Z' },
-    { id: 'p6', name: 'Cashew Mix (250g)', slug: 'cashew-mix', description: 'Premium cashews roasted with spices and curry leaves', price: 499, images: [], isPublished: true, category: DEMO_CATEGORIES[4], inventory: { stock: 30, reservedStock: 5 }, createdAt: '2026-02-15T10:00:00Z' },
-    { id: 'p7', name: 'Jaggery Peanut Bar (6 pcs)', slug: 'jaggery-peanut-bar', description: 'Crunchy peanut chikki with organic jaggery', price: 129, images: [], isPublished: false, category: DEMO_CATEGORIES[3], inventory: { stock: 100, reservedStock: 0 }, createdAt: '2026-02-14T10:00:00Z' },
-    { id: 'p8', name: 'Filter Coffee Powder (200g)', slug: 'filter-coffee-powder', description: '80:20 blend of Arabica and Robusta beans', price: 249, images: [], isPublished: true, category: DEMO_CATEGORIES[5], inventory: { stock: 35, reservedStock: 10 }, createdAt: '2026-02-13T10:00:00Z' },
-    { id: 'p9', name: 'Salt Banana Chips (500g)', slug: 'salt-banana-chips', description: 'Family pack of lightly salted banana chips', price: 329, images: [], isPublished: true, category: DEMO_CATEGORIES[0], inventory: { stock: 15, reservedStock: 3 }, createdAt: '2026-02-12T10:00:00Z' },
-    { id: 'p10', name: 'Ribbon Pakoda (250g)', slug: 'ribbon-pakoda', description: 'Thin crispy ribbon-shaped savory snack', price: 159, images: [], isPublished: true, category: DEMO_CATEGORIES[1], inventory: { stock: 40, reservedStock: 8 }, createdAt: '2026-02-11T10:00:00Z' },
-];
-/* ────────────────────────────────────────────────────────────────────────── */
+import { productsApi, categoriesApi, type Product, type Category } from '@/lib/api';
 
 export default function AdminProductsPage() {
     const { addToast } = useToast();
-    const [products, setProducts] = useState<DemoProduct[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const ITEMS_PER_PAGE = 10;
 
     // Modal state
     const [showModal, setShowModal] = useState(false);
-    const [editingProduct, setEditingProduct] = useState<DemoProduct | null>(null);
-    const [form, setForm] = useState({ name: '', description: '', price: '', categoryId: '', isPublished: true });
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [form, setForm] = useState({ name: '', slug: '', description: '', price: '', categoryId: '', isPublished: true });
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
-    const fetchProducts = useCallback(() => {
+    const fetchCategories = useCallback(async () => {
+        try {
+            const data = await categoriesApi.getAll();
+            setCategories(data);
+        } catch (error) {
+            console.error('Failed to load categories', error);
+        }
+    }, []);
+
+    const fetchProducts = useCallback(async () => {
         setIsLoading(true);
-        setTimeout(() => {
-            let filtered = [...DEMO_PRODUCTS];
-            if (search) {
-                filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-            }
-            setProducts(filtered);
+        try {
+            const res = await productsApi.getAll({
+                search: search || undefined,
+                page,
+                limit: ITEMS_PER_PAGE
+            });
+            setProducts(res.data || []);
+            setTotalPages(res.meta?.totalPages || 1);
+        } catch (error) {
+            console.error('Failed to load products', error);
+            addToast('Failed to load products', 'error');
+        } finally {
             setIsLoading(false);
-        }, 400);
-    }, [search]);
+        }
+    }, [search, page, addToast]);
+
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
 
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
 
-    const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
-    const paginatedProducts = products.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
-
     const openCreate = () => {
         setEditingProduct(null);
-        setForm({ name: '', description: '', price: '', categoryId: '', isPublished: true });
+        setForm({ name: '', slug: '', description: '', price: '', categoryId: '', isPublished: true });
         setFormErrors({});
         setShowModal(true);
     };
 
-    const openEdit = (product: DemoProduct) => {
+    const openEdit = (product: Product) => {
         setEditingProduct(product);
         setForm({
             name: product.name,
+            slug: product.slug, // Include slug for updates implicitly
             description: product.description,
             price: String(product.price),
             categoryId: product.category?.id ?? '',
-            isPublished: product.isPublished,
+            isPublished: product.isPublished ?? true,
         });
         setFormErrors({});
         setShowModal(true);
+    };
+
+    const generateSlug = (name: string) => {
+        return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     };
 
     const validateForm = () => {
@@ -116,20 +96,54 @@ export default function AdminProductsPage() {
     const handleSave = async () => {
         if (!validateForm()) return;
         setSaving(true);
-        // Simulate save
-        await new Promise(r => setTimeout(r, 800));
-        addToast(editingProduct ? 'Product updated successfully (demo)' : 'Product created successfully (demo)', 'success');
-        setShowModal(false);
-        setSaving(false);
+        try {
+            const payload = {
+                name: form.name.trim(),
+                slug: form.slug || generateSlug(form.name.trim()),
+                description: form.description.trim(),
+                price: Number(form.price),
+                categoryId: form.categoryId,
+                isPublished: form.isPublished
+            };
+
+            if (editingProduct) {
+                // Remove slug from payload on updates to avoid potential conflict if not purposely changing it
+                // Or let backend handle if it supports it
+                await productsApi.update(editingProduct.id, payload);
+                addToast('Product updated successfully', 'success');
+            } else {
+                await productsApi.create(payload as Record<string, unknown>);
+                addToast('Product created successfully', 'success');
+            }
+            setShowModal(false);
+            fetchProducts(); // Refresh list
+        } catch (error) {
+            console.error('Save error', error);
+            addToast(error instanceof Error ? error.message : 'Failed to save product', 'error');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
         setDeletingId(id);
-        await new Promise(r => setTimeout(r, 600));
-        setProducts(prev => prev.filter(p => p.id !== id));
-        addToast('Product deleted (demo)', 'info');
-        setDeletingId(null);
+        
+        try {
+            await productsApi.delete(id);
+            addToast('Product deleted successfully', 'success');
+            // If deleting the last item on a page > 1, go to previous page
+            if (products.length === 1 && page > 1) {
+                setPage(p => p - 1);
+            } else {
+                fetchProducts();
+            }
+        } catch (error) {
+            console.error('Delete error', error);
+            addToast(error instanceof Error ? error.message : 'Failed to delete product', 'error');
+        } finally {
+            setDeletingId(null);
+        }
     };
 
     return (
@@ -158,7 +172,7 @@ export default function AdminProductsPage() {
                 <div className="space-y-3">
                     {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-16 rounded-[var(--radius-md)] bg-bg-secondary animate-pulse" />)}
                 </div>
-            ) : paginatedProducts.length === 0 ? (
+            ) : products.length === 0 ? (
                 <EmptyState
                     icon="🍌"
                     title="No products found"
@@ -182,14 +196,18 @@ export default function AdminProductsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {paginatedProducts.map((product) => {
+                                {products.map((product) => {
                                     const available = product.inventory ? product.inventory.stock - product.inventory.reservedStock : 0;
                                     return (
                                         <tr key={product.id} className="border-b border-border-light hover:bg-bg-secondary/50 transition-colors">
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 shrink-0 rounded-[var(--radius-md)] bg-bg-secondary overflow-hidden flex items-center justify-center">
-                                                        <img src="/placeholder-product.svg" alt="" className="w-5 h-5 opacity-40" />
+                                                        {product.images?.[0] ? (
+                                                            <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <img src="/placeholder-product.svg" alt="" className="w-5 h-5 opacity-40" />
+                                                        )}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div className="font-medium text-text-primary truncate">{product.name}</div>
@@ -232,13 +250,17 @@ export default function AdminProductsPage() {
 
                     {/* Mobile cards */}
                     <div className="md:hidden space-y-3">
-                        {paginatedProducts.map((product) => {
+                        {products.map((product) => {
                             const available = product.inventory ? product.inventory.stock - product.inventory.reservedStock : 0;
                             return (
                                 <Card key={product.id} padding="none" className="overflow-hidden">
                                     <div className="flex gap-3 p-4">
                                         <div className="w-14 h-14 shrink-0 rounded-[var(--radius-md)] bg-bg-secondary overflow-hidden flex items-center justify-center">
-                                            <img src="/placeholder-product.svg" alt="" className="w-6 h-6 opacity-40" />
+                                            {product.images?.[0] ? (
+                                                <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <img src="/placeholder-product.svg" alt="" className="w-6 h-6 opacity-40" />
+                                            )}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-semibold text-text-primary truncate">{product.name}</div>
@@ -317,10 +339,19 @@ export default function AdminProductsPage() {
                             error={formErrors.categoryId}
                             options={[
                                 { value: '', label: 'Select category' },
-                                ...DEMO_CATEGORIES.map((c) => ({ value: c.id, label: c.name })),
+                                ...categories.map((c) => ({ value: c.id, label: c.name })),
                             ]}
                         />
                     </div>
+                    {editingProduct && (
+                        <Input
+                            id="product-slug"
+                            label="Slug URL (optional)"
+                            value={form.slug}
+                            onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                            placeholder="Leave empty to auto-generate from name"
+                        />
+                    )}
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input
                             type="checkbox"
@@ -328,7 +359,7 @@ export default function AdminProductsPage() {
                             onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
                             className="w-4 h-4 rounded border-border-default text-brand-primary focus:ring-brand-primary/30"
                         />
-                        <span className="text-sm font-medium text-text-primary">Publish immediately</span>
+                        <span className="text-sm font-medium text-text-primary">{editingProduct ? 'Publish product' : 'Publish immediately'}</span>
                     </label>
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-border-light">

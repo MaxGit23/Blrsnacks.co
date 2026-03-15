@@ -18,7 +18,7 @@ async function bootstrap() {
     origin: configService.get<string>('FRONTEND_URL', 'http://localhost:3000'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id'],
   });
 
   app.use(cookieParser());
@@ -54,6 +54,15 @@ async function bootstrap() {
 
   // Serve uploaded product images at /uploads
   app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
+
+  // ─── Admin UI (static single-page panel) ──────────────────────────────────
+  app.useStaticAssets(join(process.cwd(), 'public'), { prefix: '/admin-ui' });
+
+  // Redirect bare /admin-ui → /admin-ui/admin.html
+  const rawApp = app.getHttpAdapter().getInstance();
+  rawApp.get('/admin-ui', (_req: unknown, res: { redirect: (s: string) => void }) =>
+    res.redirect('/admin-ui/admin.html'),
+  );
 
   const port = configService.get<number>('PORT');
 

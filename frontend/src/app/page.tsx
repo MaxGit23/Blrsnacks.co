@@ -65,10 +65,12 @@ export default function Home() {
             </div>
             {/* Hero visual */}
             <div className="hidden lg:flex justify-center">
-              <div className="relative w-[420px] h-[420px] rounded-full bg-gradient-to-br from-brand-accent/20 to-brand-primary/10 flex items-center justify-center">
-                <span className="text-[140px] leading-none select-none">🍌</span>
-                <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-success/10 flex items-center justify-center text-3xl">🌶️</div>
-                <div className="absolute -bottom-2 -left-6 w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center text-2xl">🥜</div>
+              <div className="relative w-[460px] h-[460px] rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src="/hero-product.jpg"
+                  alt="BLR Snacks Co. — Authentic Bangalore Snacks"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>

@@ -46,6 +46,13 @@ export class ProductsController {
 
     // ─── Admin Routes ──────────────────────────────────────────────────────────
 
+    @Get('admin/all')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
+    async findAllAdmin(@Query() query: QueryProductDto) {
+        return this.productsService.findAll(query);
+    }
+
     @Post()
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)

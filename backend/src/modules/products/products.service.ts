@@ -22,7 +22,7 @@ export class ProductsService {
                     slug: dto.slug,
                     description: dto.description,
                     price: dto.price,
-                    categoryId: dto.categoryId,
+                    categoryId: dto.categoryId as any,
                     images: dto.images ?? [],
                     isPublished: dto.isPublished ?? false,
                     createdBy: userId,
@@ -35,7 +35,7 @@ export class ProductsService {
             await tx.inventory.create({
                 data: {
                     productId: created.id,
-                    stock: 0,
+                    stock: 999, // Automatically provide plenty of stock by default
                     reservedStock: 0,
                     updatedBy: userId,
                 },

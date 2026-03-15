@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+backend/dist/
+backend/uploads/
+node_modules/
+
+# Agent / IDE
+.agent/

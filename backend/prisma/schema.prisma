@@ -112,8 +112,8 @@ model Product {
   price       Decimal @db.Decimal(10, 2)
   images      Json
   isPublished Boolean @default(false)
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
 
   inventory  Inventory?
   cartItems  CartItem[]

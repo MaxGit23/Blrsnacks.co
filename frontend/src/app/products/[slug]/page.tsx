@@ -38,9 +38,7 @@ export default function ProductDetailPage() {
         load();
     }, [slug, router]);
 
-    const availableStock = product?.inventory
-        ? product.inventory.stock - product.inventory.reservedStock
-        : 0;
+    const availableStock = 999; // Override to ALWAYS show in stock
 
     const handleAddToCart = async () => {
         if (!product) return;

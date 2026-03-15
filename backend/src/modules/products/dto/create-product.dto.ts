@@ -21,8 +21,9 @@ export class CreateProductDto {
     @Min(0)
     price: number;
 
+    @IsOptional()
     @IsString()
-    categoryId: string;
+    categoryId?: string;
 
     @IsOptional()
     @IsArray()

@@ -29,10 +29,17 @@ class ApiClient {
     ): Promise<T> {
         const url = `${this.baseUrl}${endpoint}`;
 
+        let sessionId = typeof window !== 'undefined' ? localStorage.getItem('session_id') : null;
+        if (!sessionId && typeof window !== 'undefined') {
+            sessionId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('session_id', sessionId);
+        }
+
         const config: RequestInit = {
             credentials: 'include', // Always send cookies
             headers: {
                 'Content-Type': 'application/json',
+                ...(sessionId ? { 'x-session-id': sessionId } : {}),
                 ...options.headers,
             },
             ...options,

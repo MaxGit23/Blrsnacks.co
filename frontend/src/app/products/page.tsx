@@ -188,7 +188,7 @@ function ProductsContent() {
 }
 
 function ProductCard({ product }: { product: Product }) {
-    const inStock = product.inventory && product.inventory.stock - product.inventory.reservedStock > 0;
+    const inStock = true; // Override to ALWAYS show in stock
 
     return (
         <Link href={`/products/${product.slug}`} id={`product-${product.slug}`}>
