@@ -4,10 +4,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
 
@@ -36,8 +39,25 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
 
+  // ─── Swagger API Docs (development only) ──────────────────────────────────
+  if (configService.get<string>('NODE_ENV') !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('BLR Snacks API')
+      .setDescription('API documentation for blrsnacks.co')
+      .setVersion('1.0')
+      .addCookieAuth('access_token')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document);
+  }
+
+  // Serve uploaded product images at /uploads
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
+
   const port = configService.get<number>('PORT');
 
   await app.listen(port ?? process.env.PORT ?? 3001);
 }
 bootstrap();
+

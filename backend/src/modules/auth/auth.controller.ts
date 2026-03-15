@@ -152,21 +152,17 @@ export class AuthController {
 
     private setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
         const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+        const accessTtlMs = this.configService.get<number>('JWT_EXPIRES_IN_SECONDS', 900) * 1000;
+        const refreshTtlMs = this.configService.get<number>('JWT_REFRESH_EXPIRES_IN_SECONDS', 604800) * 1000;
 
-        res.cookie('access_token', accessToken, {
+        const cookieBase = {
             httpOnly: true,
             secure: isProduction,
-            sameSite: isProduction ? 'none' : 'lax',
-            maxAge: 15 * 60 * 1000,
+            sameSite: isProduction ? ('strict' as const) : ('lax' as const),
             path: '/',
-        });
+        };
 
-        res.cookie('refresh_token', refreshToken, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? 'none' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: '/',
-        });
+        res.cookie('access_token', accessToken, { ...cookieBase, maxAge: accessTtlMs });
+        res.cookie('refresh_token', refreshToken, { ...cookieBase, maxAge: refreshTtlMs });
     }
 }

@@ -3,14 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { productsApi, cartApi, type Product } from '@/lib/api';
+import { productsApi, type Product } from '@/lib/api';
 import { Button, Badge, Skeleton } from '@/components/ui';
+import { Container } from '@/components/layout';
+import { useCart } from '@/context/cart-context';
 import { useToast } from '@/components/ui/Toast';
+import { formatPrice } from '@/lib/format';
+import { getImageUrl } from '@/lib/images';
 
 export default function ProductDetailPage() {
     const params = useParams();
     const router = useRouter();
     const { addToast } = useToast();
+    const { addItem } = useCart();
     const slug = params.slug as string;
 
     const [product, setProduct] = useState<Product | null>(null);
@@ -41,10 +46,10 @@ export default function ProductDetailPage() {
         if (!product) return;
         setAddingToCart(true);
         try {
-            await cartApi.addItem(product.id, quantity);
-            addToast(`${product.name} added to cart!`, 'success');
+            await addItem(product.id, quantity);
+            addToast(`${product.name} added to your cart!`, 'success');
         } catch {
-            addToast('Failed to add to cart', 'error');
+            addToast('Could not add to cart — please try again', 'error');
         } finally {
             setAddingToCart(false);
         }
@@ -52,7 +57,7 @@ export default function ProductDetailPage() {
 
     if (isLoading) {
         return (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Container className="py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <Skeleton className="h-[450px] rounded-[var(--radius-xl)]" />
                     <div className="space-y-4">
@@ -63,20 +68,20 @@ export default function ProductDetailPage() {
                         <Skeleton className="h-12 w-40 mt-6" />
                     </div>
                 </div>
-            </div>
+            </Container>
         );
     }
 
     if (!product) return null;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+        <Container className="py-8 animate-fade-in">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-sm text-text-tertiary mb-8">
+            <nav className="flex items-center gap-2 text-sm text-text-tertiary mb-8" aria-label="Breadcrumb">
                 <Link href="/" className="hover:text-brand-primary transition-colors">Home</Link>
-                <span>/</span>
-                <Link href="/products" className="hover:text-brand-primary transition-colors">Products</Link>
-                <span>/</span>
+                <span aria-hidden>/</span>
+                <Link href="/products" className="hover:text-brand-primary transition-colors">Snacks</Link>
+                <span aria-hidden>/</span>
                 <span className="text-text-primary font-medium">{product.name}</span>
             </nav>
 
@@ -86,13 +91,14 @@ export default function ProductDetailPage() {
                     <div className="relative aspect-square bg-bg-secondary rounded-[var(--radius-xl)] overflow-hidden mb-4">
                         {product.images.length > 0 ? (
                             <img
-                                src={product.images[selectedImage]}
+                                src={getImageUrl(product.images[selectedImage])}
                                 alt={product.name}
                                 className="w-full h-full object-cover"
+                                id="product-main-image"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                                <span className="text-8xl opacity-30">📦</span>
+                                <img src="/placeholder-product.svg" alt={product.name} className="w-32 h-32 opacity-40" />
                             </div>
                         )}
                     </div>
@@ -102,10 +108,10 @@ export default function ProductDetailPage() {
                                 <button
                                     key={i}
                                     onClick={() => setSelectedImage(i)}
-                                    className={`shrink-0 w-20 h-20 rounded-[var(--radius-md)] overflow-hidden border-2 transition-all ${i === selectedImage ? 'border-brand-primary shadow-md' : 'border-border-light hover:border-border-dark'
-                                        }`}
+                                    id={`product-thumb-${i}`}
+                                    className={`shrink-0 w-20 h-20 rounded-[var(--radius-md)] overflow-hidden border-2 transition-all ${i === selectedImage ? 'border-brand-primary shadow-md' : 'border-border-light hover:border-border-dark'}`}
                                 >
-                                    <img src={img} alt="" className="w-full h-full object-cover" />
+                                    <img src={getImageUrl(img)} alt="" className="w-full h-full object-cover" />
                                 </button>
                             ))}
                         </div>
@@ -125,11 +131,13 @@ export default function ProductDetailPage() {
                     <h1 className="text-3xl md:text-4xl font-bold text-brand-secondary mt-2">{product.name}</h1>
 
                     <div className="flex items-center gap-3 mt-4">
-                        <span className="text-3xl font-bold text-brand-primary">₹{Number(product.price).toFixed(0)}</span>
+                        <span className="text-3xl font-bold text-brand-primary" id="product-price">
+                            {formatPrice(Number(product.price))}
+                        </span>
                         {availableStock > 0 ? (
                             <Badge variant="success">In Stock</Badge>
                         ) : (
-                            <Badge variant="error">Out of Stock</Badge>
+                            <Badge variant="error">Sold Out</Badge>
                         )}
                     </div>
 
@@ -139,20 +147,22 @@ export default function ProductDetailPage() {
                     {availableStock > 0 && (
                         <div className="mt-8 space-y-4">
                             <div className="flex items-center gap-4">
-                                <label className="text-sm font-medium text-text-primary">Quantity:</label>
+                                <label htmlFor="qty" className="text-sm font-medium text-text-primary">Quantity:</label>
                                 <div className="flex items-center border border-border-default rounded-[var(--radius-md)]">
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                         className="px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors rounded-l-[var(--radius-md)]"
+                                        aria-label="Decrease quantity"
                                     >
                                         −
                                     </button>
-                                    <span className="px-4 py-2 text-sm font-semibold border-x border-border-default min-w-[48px] text-center">
+                                    <span id="qty" className="px-4 py-2 text-sm font-semibold border-x border-border-default min-w-[48px] text-center">
                                         {quantity}
                                     </span>
                                     <button
                                         onClick={() => setQuantity(Math.min(availableStock, quantity + 1))}
                                         className="px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors rounded-r-[var(--radius-md)]"
+                                        aria-label="Increase quantity"
                                     >
                                         +
                                     </button>
@@ -160,26 +170,25 @@ export default function ProductDetailPage() {
                                 <span className="text-xs text-text-tertiary">{availableStock} available</span>
                             </div>
 
-                            <div className="flex gap-3">
-                                <Button
-                                    size="lg"
-                                    fullWidth
-                                    isLoading={addingToCart}
-                                    onClick={handleAddToCart}
-                                >
-                                    Add to Cart — ₹{(Number(product.price) * quantity).toFixed(0)}
-                                </Button>
-                            </div>
+                            <Button
+                                id="add-to-cart-btn"
+                                size="lg"
+                                fullWidth
+                                isLoading={addingToCart}
+                                onClick={handleAddToCart}
+                            >
+                                Add to Cart — {formatPrice(Number(product.price) * quantity)}
+                            </Button>
                         </div>
                     )}
 
-                    {/* Info rows */}
+                    {/* Delivery info */}
                     <div className="mt-10 border-t border-border-light pt-6 space-y-3">
                         {[
                             { icon: '🚚', text: 'Free delivery on orders above ₹500' },
-                            { icon: '💰', text: 'Cash on Delivery available' },
-                            { icon: '📦', text: 'Same-day delivery in Bangalore' },
-                            { icon: '✨', text: 'Made fresh daily, no preservatives' },
+                            { icon: '💰', text: 'Cash on Delivery — no prepayment needed' },
+                            { icon: '⚡', text: 'Same-day delivery across Bangalore' },
+                            { icon: '🌿', text: 'Freshly prepared, zero preservatives' },
                         ].map((info) => (
                             <div key={info.text} className="flex items-center gap-3 text-sm text-text-secondary">
                                 <span>{info.icon}</span>
@@ -189,6 +198,6 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </Container>
     );
 }

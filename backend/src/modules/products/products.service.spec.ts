@@ -5,7 +5,6 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {
     let service: ProductsService;
-    let prisma: PrismaService;
 
     const mockPrismaService = {
         product: {
@@ -31,7 +30,6 @@ describe('ProductsService', () => {
         }).compile();
 
         service = module.get<ProductsService>(ProductsService);
-        prisma = module.get<PrismaService>(PrismaService);
 
         jest.clearAllMocks();
     });
@@ -39,6 +37,8 @@ describe('ProductsService', () => {
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
+
+    // ─── create ─────────────────────────────────────────────────────────────────
 
     describe('create', () => {
         const createDto = {
@@ -82,7 +82,25 @@ describe('ProductsService', () => {
                 },
             });
         });
+
+        it('should default isPublished to false when not provided', async () => {
+            const dtoWithoutPublished = { ...createDto, isPublished: undefined };
+            mockPrismaService.product.findUnique.mockResolvedValue(null);
+            mockPrismaService.$transaction.mockImplementation(async (fn: (tx: typeof mockPrismaService) => Promise<unknown>) => fn(mockPrismaService));
+            mockPrismaService.product.create.mockResolvedValue({ id: 'prod-1', ...dtoWithoutPublished });
+            mockPrismaService.inventory.create.mockResolvedValue({});
+
+            await service.create(dtoWithoutPublished, 'user-1');
+
+            expect(mockPrismaService.product.create).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({ isPublished: false }),
+                }),
+            );
+        });
     });
+
+    // ─── findBySlug ─────────────────────────────────────────────────────────────
 
     describe('findBySlug', () => {
         it('should throw NotFoundException if product not found', async () => {
@@ -105,7 +123,20 @@ describe('ProductsService', () => {
             const result = await service.findBySlug('test-product');
             expect(result).toEqual(mockProduct);
         });
+
+        it('should filter out soft-deleted products', async () => {
+            mockPrismaService.product.findFirst.mockResolvedValue(null);
+
+            await expect(service.findBySlug('deleted-product')).rejects.toThrow(NotFoundException);
+            expect(mockPrismaService.product.findFirst).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: expect.objectContaining({ deletedAt: null }),
+                }),
+            );
+        });
     });
+
+    // ─── findAll (pagination + search + filters) ────────────────────────────────
 
     describe('findAll', () => {
         it('should return paginated products', async () => {
@@ -122,7 +153,111 @@ describe('ProductsService', () => {
             expect(result.meta.page).toBe(1);
             expect(result.meta.totalPages).toBe(1);
         });
+
+        it('should calculate totalPages correctly', async () => {
+            mockPrismaService.$transaction.mockResolvedValue([[], 25]);
+
+            const result = await service.findAll({ page: 1, limit: 10 });
+            expect(result.meta.totalPages).toBe(3);
+        });
+
+        it('should apply search filter to name and description', async () => {
+            mockPrismaService.$transaction.mockResolvedValue([[], 0]);
+
+            await service.findAll({ search: 'banana' });
+
+            expect(mockPrismaService.$transaction).toHaveBeenCalled();
+        });
+
+        it('should filter by categoryId', async () => {
+            mockPrismaService.$transaction.mockResolvedValue([[], 0]);
+
+            await service.findAll({ categoryId: 'cat-1' });
+
+            expect(mockPrismaService.$transaction).toHaveBeenCalled();
+        });
+
+        it('should filter by price range', async () => {
+            mockPrismaService.$transaction.mockResolvedValue([[], 0]);
+
+            await service.findAll({ minPrice: 10, maxPrice: 100 });
+
+            expect(mockPrismaService.$transaction).toHaveBeenCalled();
+        });
+
+        it('should default to page 1 and limit 20', async () => {
+            mockPrismaService.$transaction.mockResolvedValue([[], 0]);
+
+            const result = await service.findAll({});
+            expect(result.meta.page).toBe(1);
+            expect(result.meta.limit).toBe(20);
+        });
     });
+
+    // ─── update ────────────────────────────────────────────────────────────────
+
+    describe('update', () => {
+        it('should throw NotFoundException if product does not exist', async () => {
+            mockPrismaService.product.findFirst.mockResolvedValue(null);
+
+            await expect(
+                service.update('non-existent', { name: 'New Name' }, 'admin-1'),
+            ).rejects.toThrow(NotFoundException);
+        });
+
+        it('should throw ConflictException if new slug already exists on another product', async () => {
+            mockPrismaService.product.findFirst
+                .mockResolvedValueOnce({ id: 'prod-1' }) // findById succeeds
+                .mockResolvedValueOnce({ id: 'prod-2', slug: 'taken-slug' }); // slug collision
+
+            await expect(
+                service.update('prod-1', { slug: 'taken-slug' }, 'admin-1'),
+            ).rejects.toThrow(ConflictException);
+        });
+
+        it('should update product successfully and set updatedBy', async () => {
+            mockPrismaService.product.findFirst.mockResolvedValue({ id: 'prod-1' });
+            const updatedProduct = { id: 'prod-1', name: 'Updated Name', category: {}, inventory: {} };
+            mockPrismaService.product.update.mockResolvedValue(updatedProduct);
+
+            const result = await service.update('prod-1', { name: 'Updated Name' }, 'admin-1');
+
+            expect(result.name).toBe('Updated Name');
+            expect(mockPrismaService.product.update).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({ updatedBy: 'admin-1' }),
+                }),
+            );
+        });
+    });
+
+    // ─── updateImages ──────────────────────────────────────────────────────────
+
+    describe('updateImages', () => {
+        it('should throw NotFoundException if product does not exist', async () => {
+            mockPrismaService.product.findFirst.mockResolvedValue(null);
+
+            await expect(
+                service.updateImages('non-existent', ['img.jpg'], 'admin-1'),
+            ).rejects.toThrow(NotFoundException);
+        });
+
+        it('should update images array on the product', async () => {
+            mockPrismaService.product.findFirst.mockResolvedValue({ id: 'prod-1' });
+            const imageUrls = ['/uploads/products/img1.jpg', '/uploads/products/img2.jpg'];
+            mockPrismaService.product.update.mockResolvedValue({ id: 'prod-1', images: imageUrls });
+
+            const result = await service.updateImages('prod-1', imageUrls, 'admin-1');
+
+            expect(result.images).toEqual(imageUrls);
+            expect(mockPrismaService.product.update).toHaveBeenCalledWith({
+                where: { id: 'prod-1' },
+                data: { images: imageUrls, updatedBy: 'admin-1' },
+            });
+        });
+    });
+
+    // ─── softDelete ────────────────────────────────────────────────────────────
 
     describe('softDelete', () => {
         it('should throw NotFoundException if product not found', async () => {

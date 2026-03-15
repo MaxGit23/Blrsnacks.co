@@ -21,10 +21,10 @@ export default function RegisterPage() {
 
     const validate = () => {
         const errs: Record<string, string> = {};
-        if (!email) errs.email = 'Email is required';
-        else if (!/\S+@\S+\.\S+/.test(email)) errs.email = 'Enter a valid email';
+        if (!email) errs.email = 'Email address is required';
+        else if (!/\S+@\S+\.\S+/.test(email)) errs.email = 'Please enter a valid email';
         if (!password) errs.password = 'Password is required';
-        else if (password.length < 8) errs.password = 'Minimum 8 characters';
+        else if (password.length < 8) errs.password = 'Must be at least 8 characters';
         if (password !== confirmPassword) errs.confirmPassword = 'Passwords do not match';
         setErrors(errs);
         return Object.keys(errs).length === 0;
@@ -38,11 +38,11 @@ export default function RegisterPage() {
         setErrors({});
         try {
             await register(email, password);
-            addToast('Account created! Welcome to BLR Snacks 🎉', 'success');
+            addToast('Account created — welcome to BLR Snacks! 🎉', 'success');
             router.push('/');
         } catch (err) {
             const apiError = err as ApiError;
-            setErrors({ general: apiError.message ?? 'Registration failed' });
+            setErrors({ general: apiError.message ?? 'Could not create your account. Please try again.' });
         } finally {
             setIsLoading(false);
         }
@@ -54,21 +54,22 @@ export default function RegisterPage() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-block text-3xl mb-4">🍌</Link>
-                    <h1 className="text-2xl font-bold text-brand-secondary">Create Your Account</h1>
-                    <p className="text-text-secondary mt-2">Join BLR Snacks and start ordering fresh snacks</p>
+                    <h1 className="text-2xl font-bold text-brand-secondary">Join BLR Snacks</h1>
+                    <p className="text-text-secondary mt-2">Create your account and start ordering fresh snacks today</p>
                 </div>
 
                 {/* Form Card */}
                 <div className="bg-white border border-border-light rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] p-8">
                     {errors.general && (
-                        <div className="mb-6 px-4 py-3 bg-error-light text-error text-sm rounded-[var(--radius-md)]">
+                        <div className="mb-6 px-4 py-3 bg-error-light text-error text-sm rounded-[var(--radius-md)]" role="alert">
                             {errors.general}
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <Input
-                            label="Email"
+                            id="register-email"
+                            label="Email Address"
                             type="email"
                             placeholder="you@example.com"
                             value={email}
@@ -77,15 +78,17 @@ export default function RegisterPage() {
                             autoComplete="email"
                         />
                         <Input
+                            id="register-password"
                             label="Password"
                             type="password"
-                            placeholder="Minimum 8 characters"
+                            placeholder="At least 8 characters"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             error={errors.password}
                             autoComplete="new-password"
                         />
                         <Input
+                            id="register-confirm"
                             label="Confirm Password"
                             type="password"
                             placeholder="Re-enter your password"
@@ -95,7 +98,7 @@ export default function RegisterPage() {
                             autoComplete="new-password"
                         />
 
-                        <Button type="submit" fullWidth size="lg" isLoading={isLoading}>
+                        <Button id="register-submit" type="submit" fullWidth size="lg" isLoading={isLoading}>
                             Create Account
                         </Button>
                     </form>
@@ -105,11 +108,12 @@ export default function RegisterPage() {
                             <div className="w-full border-t border-border-light" />
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white px-3 text-text-tertiary">or</span>
+                            <span className="bg-white px-3 text-text-tertiary">or continue with</span>
                         </div>
                     </div>
 
                     <button
+                        id="google-register-btn"
                         type="button"
                         className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border-default rounded-[var(--radius-md)] text-sm font-medium text-text-primary hover:bg-bg-tertiary transition-colors"
                     >
@@ -119,7 +123,7 @@ export default function RegisterPage() {
                             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                         </svg>
-                        Sign up with Google
+                        Google
                     </button>
                 </div>
 

@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
+import { useCart } from '@/context/cart-context';
 import Button from '@/components/ui/Button';
 
 export default function Header() {
     const { user, isAuthenticated, logout } = useAuth();
+    const { itemCount } = useCart();
     const [mobileOpen, setMobileOpen] = useState(false);
 
     return (
@@ -47,6 +49,11 @@ export default function Header() {
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                             </svg>
+                            {itemCount > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-brand-primary rounded-full animate-scale-in">
+                                    {itemCount > 99 ? '99+' : itemCount}
+                                </span>
+                            )}
                         </Link>
 
                         {isAuthenticated ? (
@@ -82,36 +89,55 @@ export default function Header() {
                     </div>
 
                     {/* Mobile Menu Toggle */}
-                    <button
-                        className="md:hidden p-2 rounded-[var(--radius-md)] text-text-secondary hover:bg-bg-tertiary"
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                    >
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                            {mobileOpen ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    <div className="flex items-center gap-2 md:hidden">
+                        <Link
+                            href="/cart"
+                            className="relative p-2 rounded-[var(--radius-md)] text-text-secondary hover:text-brand-primary"
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                            {itemCount > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-brand-primary rounded-full">
+                                    {itemCount > 99 ? '99+' : itemCount}
+                                </span>
                             )}
-                        </svg>
-                    </button>
+                        </Link>
+                        <button
+                            className="p-2 rounded-[var(--radius-md)] text-text-secondary hover:bg-bg-tertiary"
+                            onClick={() => setMobileOpen(!mobileOpen)}
+                            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                        >
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                {mobileOpen ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                                )}
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Nav */}
                 {mobileOpen && (
                     <div className="md:hidden py-4 border-t border-border-light animate-fade-in-up">
                         <div className="flex flex-col gap-3">
-                            <Link href="/products" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5">Shop</Link>
-                            <Link href="/categories" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5">Categories</Link>
-                            <Link href="/cart" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5">Cart</Link>
+                            <Link href="/products" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5" onClick={() => setMobileOpen(false)}>Shop</Link>
+                            <Link href="/categories" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5" onClick={() => setMobileOpen(false)}>Categories</Link>
+                            <Link href="/cart" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5" onClick={() => setMobileOpen(false)}>Cart{itemCount > 0 && ` (${itemCount})`}</Link>
                             {isAuthenticated ? (
                                 <>
-                                    <Link href="/orders" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5">Orders</Link>
-                                    <button onClick={logout} className="text-left text-sm font-medium text-error px-2 py-1.5">Logout</button>
+                                    <Link href="/orders" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5" onClick={() => setMobileOpen(false)}>Orders</Link>
+                                    {user?.role === 'ADMIN' && (
+                                        <Link href="/admin" className="text-sm font-medium text-brand-primary px-2 py-1.5" onClick={() => setMobileOpen(false)}>Admin</Link>
+                                    )}
+                                    <button onClick={() => { logout(); setMobileOpen(false); }} className="text-left text-sm font-medium text-error px-2 py-1.5">Logout</button>
                                 </>
                             ) : (
                                 <>
-                                    <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5">Login</Link>
-                                    <Link href="/register" className="text-sm font-medium text-brand-primary px-2 py-1.5">Sign Up</Link>
+                                    <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-brand-primary px-2 py-1.5" onClick={() => setMobileOpen(false)}>Login</Link>
+                                    <Link href="/register" className="text-sm font-medium text-brand-primary px-2 py-1.5" onClick={() => setMobileOpen(false)}>Sign Up</Link>
                                 </>
                             )}
                         </div>

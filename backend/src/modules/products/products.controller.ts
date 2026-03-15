@@ -13,6 +13,10 @@ import {
     Logger,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import { mkdirSync, existsSync } from 'fs';
+import { randomUUID } from 'crypto';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, QueryProductDto } from './dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -75,10 +79,26 @@ export class ProductsController {
     @Roles(Role.ADMIN)
     @UseInterceptors(
         FilesInterceptor('images', 10, {
+            storage: diskStorage({
+                destination: (_req, _file, cb) => {
+                    const uploadDir = join(process.cwd(), 'uploads', 'products');
+                    if (!existsSync(uploadDir)) {
+                        mkdirSync(uploadDir, { recursive: true });
+                    }
+                    cb(null, uploadDir);
+                },
+                filename: (_req, file, cb) => {
+                    const uniqueName = `${randomUUID()}${extname(file.originalname)}`;
+                    cb(null, uniqueName);
+                },
+            }),
             limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
             fileFilter: (_req, file, cb) => {
                 if (!file.mimetype.match(/^image\/(jpeg|png|webp|avif)$/)) {
-                    cb(new Error('Only image files (jpeg, png, webp, avif) are allowed'), false);
+                    cb(
+                        new Error('Only image files (jpeg, png, webp, avif) are allowed'),
+                        false,
+                    );
                 } else {
                     cb(null, true);
                 }
@@ -90,10 +110,8 @@ export class ProductsController {
         @UploadedFiles() files: Express.Multer.File[],
         @CurrentUser() user: JwtPayload,
     ) {
-        // In production, upload to S3/R2 and return URLs
-        // For now, generate local placeholder paths
         const imageUrls = files.map(
-            (file) => `/uploads/products/${id}/${file.originalname}`,
+            (file) => `/uploads/products/${file.filename}`,
         );
 
         this.logger.log(`Uploaded ${files.length} images for product ${id}`);

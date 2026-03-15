@@ -4,9 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ordersApi, type Order } from '@/lib/api';
-import { Button, Badge, Card, Skeleton } from '@/components/ui';
+import { Button, Badge, Card, Skeleton, Pagination, EmptyState } from '@/components/ui';
+import { Container, PageHeader } from '@/components/layout';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/components/ui/Toast';
+import { formatPrice, formatDate } from '@/lib/format';
+import { getImageUrl } from '@/lib/images';
 
 const statusVariant: Record<string, 'default' | 'success' | 'warning' | 'error' | 'info' | 'brand'> = {
     PENDING: 'warning',
@@ -14,6 +17,14 @@ const statusVariant: Record<string, 'default' | 'success' | 'warning' | 'error' 
     SHIPPED: 'brand',
     DELIVERED: 'success',
     CANCELLED: 'error',
+};
+
+const statusLabels: Record<string, string> = {
+    PENDING: 'Pending',
+    CONFIRMED: 'Confirmed',
+    SHIPPED: 'Shipped',
+    DELIVERED: 'Delivered',
+    CANCELLED: 'Cancelled',
 };
 
 export default function OrdersPage() {
@@ -62,7 +73,7 @@ export default function OrdersPage() {
             addToast('Order cancelled successfully', 'info');
             fetchOrders();
         } catch {
-            addToast('Failed to cancel order', 'error');
+            addToast('Could not cancel this order', 'error');
         } finally {
             setCancellingId(null);
         }
@@ -70,42 +81,43 @@ export default function OrdersPage() {
 
     if (authLoading) {
         return (
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <Container size="md" className="py-8">
                 <Skeleton className="h-8 w-48 mb-8" />
                 <div className="space-y-4">
                     {[1, 2, 3].map((i) => <Skeleton key={i} className="h-32 w-full rounded-[var(--radius-lg)]" />)}
                 </div>
-            </div>
+            </Container>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
-            {/* ─── Profile Header ──────────────────────────────────────────── */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-brand-secondary">My Orders</h1>
-                    <p className="text-text-secondary mt-1">
-                        Signed in as <span className="font-medium text-text-primary">{user?.email}</span>
-                    </p>
-                </div>
+        <Container size="md" className="py-8 animate-fade-in">
+            <PageHeader title="My Orders" description={`Signed in as ${user?.email ?? ''}`}>
                 <Link href="/products">
                     <Button variant="outline" size="sm">Continue Shopping</Button>
                 </Link>
-            </div>
+            </PageHeader>
 
             {/* ─── Status Filters ──────────────────────────────────────────── */}
             <div className="flex flex-wrap gap-2 mb-6">
-                {['', 'PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map((status) => (
+                {[
+                    { value: '', label: 'All Orders' },
+                    { value: 'PENDING', label: 'Pending' },
+                    { value: 'CONFIRMED', label: 'Confirmed' },
+                    { value: 'SHIPPED', label: 'Shipped' },
+                    { value: 'DELIVERED', label: 'Delivered' },
+                    { value: 'CANCELLED', label: 'Cancelled' },
+                ].map(({ value, label }) => (
                     <button
-                        key={status}
-                        onClick={() => { setStatusFilter(status); setPage(1); }}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-[var(--radius-full)] border transition-all ${statusFilter === status
+                        key={value}
+                        id={`filter-${value || 'all'}`}
+                        onClick={() => { setStatusFilter(value); setPage(1); }}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-[var(--radius-full)] border transition-all ${statusFilter === value
                                 ? 'bg-brand-primary text-white border-brand-primary'
                                 : 'bg-white text-text-secondary border-border-default hover:border-brand-primary/30'
                             }`}
                     >
-                        {status || 'All'}
+                        {label}
                     </button>
                 ))}
             </div>
@@ -116,16 +128,13 @@ export default function OrdersPage() {
                     {[1, 2, 3].map((i) => <Skeleton key={i} className="h-36 w-full rounded-[var(--radius-lg)]" />)}
                 </div>
             ) : orders.length === 0 ? (
-                <div className="text-center py-20">
-                    <span className="text-5xl mb-4 block">📦</span>
-                    <h3 className="text-lg font-semibold text-text-primary mb-2">No orders found</h3>
-                    <p className="text-text-secondary mb-6">
-                        {statusFilter ? 'Try a different filter' : 'Start shopping to see your orders here'}
-                    </p>
-                    <Link href="/products">
-                        <Button variant="primary">Browse Snacks</Button>
-                    </Link>
-                </div>
+                <EmptyState
+                    icon="📦"
+                    title="No orders found"
+                    description={statusFilter ? 'No orders match this filter — try a different one' : 'You haven\'t placed any orders yet. Browse our snacks collection to get started!'}
+                    actionLabel="Browse Snacks"
+                    actionHref="/products"
+                />
             ) : (
                 <div className="space-y-4">
                     {orders.map((order) => (
@@ -134,11 +143,11 @@ export default function OrdersPage() {
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-bg-secondary border-b border-border-light gap-2">
                                 <div className="flex items-center gap-3">
                                     <span className="text-xs text-text-tertiary font-mono">#{order.id.slice(0, 8).toUpperCase()}</span>
-                                    <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
+                                    <Badge variant={statusVariant[order.status]}>{statusLabels[order.status] ?? order.status}</Badge>
                                 </div>
                                 <div className="flex items-center gap-4 text-xs text-text-tertiary">
-                                    <span>{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                                    <span className="font-semibold text-text-primary text-sm">₹{Number(order.totalAmount).toFixed(0)}</span>
+                                    <span>{formatDate(order.createdAt)}</span>
+                                    <span className="font-semibold text-text-primary text-sm">{formatPrice(Number(order.totalAmount))}</span>
                                 </div>
                             </div>
 
@@ -149,9 +158,11 @@ export default function OrdersPage() {
                                         <div key={item.id} className="flex items-center gap-3 bg-bg-secondary rounded-[var(--radius-md)] pr-3">
                                             <div className="w-12 h-12 rounded-l-[var(--radius-md)] bg-bg-tertiary overflow-hidden shrink-0">
                                                 {item.product.images?.length > 0 ? (
-                                                    <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
+                                                    <img src={getImageUrl(item.product.images[0])} alt={item.product.name} className="w-full h-full object-cover" loading="lazy" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-lg opacity-30">📦</div>
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <img src="/placeholder-product.svg" alt="" className="w-6 h-6 opacity-40" />
+                                                    </div>
                                                 )}
                                             </div>
                                             <div>
@@ -190,28 +201,15 @@ export default function OrdersPage() {
                         </Card>
                     ))}
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-2 mt-8">
-                            <button
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                disabled={page === 1}
-                                className="px-3 py-2 text-sm rounded-[var(--radius-md)] border border-border-default hover:bg-bg-tertiary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                            >
-                                ← Prev
-                            </button>
-                            <span className="text-sm text-text-secondary">Page {page} of {totalPages}</span>
-                            <button
-                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                disabled={page === totalPages}
-                                className="px-3 py-2 text-sm rounded-[var(--radius-md)] border border-border-default hover:bg-bg-tertiary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                            >
-                                Next →
-                            </button>
-                        </div>
-                    )}
+                    <div className="mt-8">
+                        <Pagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
+                    </div>
                 </div>
             )}
-        </div>
+        </Container>
     );
 }

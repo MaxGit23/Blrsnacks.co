@@ -118,7 +118,7 @@ export class InventoryService {
                 product: { deletedAt: null },
             },
             include: {
-                product: { select: { id: true, name: true, slug: true } },
+                product: { select: { id: true, name: true, slug: true, price: true, images: true } },
             },
             orderBy: { stock: 'asc' },
         });

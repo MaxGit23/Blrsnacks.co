@@ -15,20 +15,33 @@ export class AllExceptionsFilter implements ExceptionFilter {
                 ? exception.getStatus()
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
-        const message =
-            exception instanceof HttpException
-                ? exception.getResponse()
-                : 'Internal server error';
+        // Extract the message for known HTTP exceptions
+        let errorBody: string | object;
+        if (exception instanceof HttpException) {
+            const exResponse = exception.getResponse();
+            errorBody = typeof exResponse === 'string'
+                ? { message: exResponse }
+                : exResponse;
+        } else {
+            // Never leak internal error details to clients
+            errorBody = { message: 'Internal server error' };
+        }
 
-        this.logger.error(`[${request.method}] ${request.url} - Status: ${status} - Error: ${JSON.stringify(message)}`);
+        // Log the full error internally (including stack trace for 5xx)
+        if (status >= 500) {
+            this.logger.error(
+                `[${request.method}] ${request.url} - Status: ${status}`,
+                exception instanceof Error ? exception.stack : String(exception),
+            );
+        } else {
+            this.logger.warn(`[${request.method}] ${request.url} - Status: ${status} - ${JSON.stringify(errorBody)}`);
+        }
 
-        response
-            .status(status)
-            .json({
-                statusCode: status,
-                timestamp: new Date().toISOString(),
-                path: request.url,
-                error: message,
-            });
+        response.status(status).json({
+            statusCode: status,
+            timestamp: new Date().toISOString(),
+            path: request.url,
+            ...(typeof errorBody === 'object' ? errorBody : { message: errorBody }),
+        });
     }
 }

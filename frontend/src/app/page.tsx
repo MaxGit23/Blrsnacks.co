@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { generateSeoMetadata } from '@/lib/seo';
 
 export const metadata = generateSeoMetadata({
-  title: 'Authentic Bangalore Snacks Delivered Fresh',
+  title: 'Authentic Bangalore Snacks — Delivered Fresh Daily',
   path: '/',
 });
 
@@ -16,52 +16,54 @@ export default function Home() {
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 text-xs font-semibold uppercase tracking-wider text-brand-primary bg-brand-primary/10 rounded-[var(--radius-full)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
-                Now delivering across Bangalore
+                Fresh batches prepared every morning
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-brand-secondary leading-[1.1] tracking-tight">
-                Farm-Fresh Snacks,
+                Real Bangalore Flavours,
                 <br />
-                <span className="text-brand-primary">Straight to You</span>
+                <span className="text-brand-primary">At Your Doorstep</span>
               </h1>
               <p className="mt-6 text-lg text-text-secondary leading-relaxed">
-                Handcrafted banana chips, spicy mixtures, aromatic murukku, and
-                traditional sweets — made with authentic South Indian recipes and
-                delivered fresh daily.
+                Crispy banana chips, fiery mixtures, crunchy murukku, and
+                traditional sweets — small-batch crafted from time-honoured
+                South Indian recipes and delivered same-day across Bangalore.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   href="/products"
+                  id="hero-shop-btn"
                   className="inline-flex items-center px-7 py-3.5 bg-brand-primary text-white font-semibold rounded-[var(--radius-md)] hover:bg-brand-primary-hover transition-all active:scale-[0.98] shadow-lg shadow-brand-primary/25"
                 >
-                  Browse All Snacks
+                  Explore All Snacks
                   <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
                 </Link>
                 <Link
                   href="/categories"
+                  id="hero-categories-btn"
                   className="inline-flex items-center px-7 py-3.5 border-2 border-brand-secondary/15 text-brand-secondary font-semibold rounded-[var(--radius-md)] hover:border-brand-primary hover:text-brand-primary hover:bg-brand-primary-light transition-all active:scale-[0.98]"
                 >
-                  View Categories
+                  Browse Categories
                 </Link>
               </div>
-              {/* Trust badges */}
+              {/* Trust signals */}
               <div className="mt-10 flex items-center gap-6 text-sm text-text-tertiary">
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  No preservatives
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  Made daily
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  COD available
-                </span>
+                {[
+                  'Zero preservatives',
+                  'Made fresh daily',
+                  'Cash on delivery',
+                ].map((text) => (
+                  <span key={text} className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    {text}
+                  </span>
+                ))}
               </div>
             </div>
-            {/* Hero visual placeholder */}
+            {/* Hero visual */}
             <div className="hidden lg:flex justify-center">
               <div className="relative w-[420px] h-[420px] rounded-full bg-gradient-to-br from-brand-accent/20 to-brand-primary/10 flex items-center justify-center">
                 <span className="text-[140px] leading-none select-none">🍌</span>
@@ -81,7 +83,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-text-primary">Shop by Category</h2>
             <Link href="/categories" className="text-sm font-medium text-brand-primary hover:text-brand-primary-hover transition-colors">
-              View all →
+              All categories →
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
@@ -96,6 +98,7 @@ export default function Home() {
               <Link
                 key={cat.slug}
                 href={`/products?category=${cat.slug}`}
+                id={`cat-${cat.slug}`}
                 className="flex flex-col items-center gap-2 p-4 bg-white rounded-[var(--radius-lg)] border border-border-light hover:border-brand-primary/30 hover:shadow-[var(--shadow-md)] transition-all group"
               >
                 <span className="text-3xl group-hover:scale-110 transition-transform">{cat.emoji}</span>
@@ -109,16 +112,17 @@ export default function Home() {
       {/* ─── How It Works ─────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-brand-secondary">How It Works</h2>
-          <p className="mt-3 text-text-secondary max-w-md mx-auto">From our kitchen to your doorstep in three simple steps</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-secondary">From Kitchen to Doorstep</h2>
+          <p className="mt-3 text-text-secondary max-w-md mx-auto">
+            Three simple steps to get authentic Bangalore snacks delivered fresh
+          </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {/* Connector line (desktop) */}
           <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-px bg-border-light" />
           {[
-            { step: '01', icon: '🛒', title: 'Pick Your Favourites', desc: 'Browse our curated selection of authentic Bangalore snacks and add to cart.' },
-            { step: '02', icon: '📍', title: 'Choose Delivery', desc: 'Enter your address. We deliver across Bangalore with same-day options.' },
-            { step: '03', icon: '📦', title: 'Pay on Delivery', desc: 'No online payment needed. Pay cash when your fresh snacks arrive.' },
+            { step: '01', icon: '🛒', title: 'Choose Your Favourites', desc: 'Browse our curated range of handcrafted snacks and add them to your cart.' },
+            { step: '02', icon: '📍', title: 'Enter Your Address', desc: 'We deliver across Bangalore — select your preferred time slot for same-day delivery.' },
+            { step: '03', icon: '💰', title: 'Pay When It Arrives', desc: 'No upfront payment required. Simply pay cash when your fresh snacks are at your door.' },
           ].map((item) => (
             <div key={item.step} className="relative text-center px-4">
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-brand-primary-light mb-6 relative z-10">
@@ -137,15 +141,19 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold leading-tight">Why Thousands Choose BLR Snacks</h2>
-              <p className="mt-4 text-text-inverse/60 leading-relaxed">We&apos;re not just another snack store. Every product is crafted in small batches using recipes passed down through generations.</p>
+              <h2 className="text-2xl md:text-3xl font-bold leading-tight">Why Bangalore Trusts BLR Snacks</h2>
+              <p className="mt-4 text-text-inverse/60 leading-relaxed">
+                We&apos;re more than a snack store. Every batch is prepared fresh using
+                recipes handed down through generations of South Indian kitchens —
+                with zero artificial additives.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-6">
               {[
-                { value: '5000+', label: 'Happy Customers' },
-                { value: '50+', label: 'Products' },
-                { value: '99%', label: 'On-time Delivery' },
-                { value: '0', label: 'Preservatives Used' },
+                { value: '5,000+', label: 'Satisfied Customers' },
+                { value: '50+', label: 'Handcrafted Products' },
+                { value: '99%', label: 'On-time Deliveries' },
+                { value: '0', label: 'Artificial Additives' },
               ].map((stat) => (
                 <div key={stat.label} className="text-center p-5 rounded-[var(--radius-lg)] bg-white/5 border border-white/10">
                   <div className="text-2xl md:text-3xl font-bold text-brand-accent">{stat.value}</div>
@@ -160,10 +168,15 @@ export default function Home() {
       {/* ─── CTA Banner ───────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="relative overflow-hidden rounded-[var(--radius-xl)] bg-gradient-to-r from-brand-primary to-brand-accent px-8 md:px-16 py-14 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Ready to Taste Bangalore?</h2>
-          <p className="text-white/80 mb-8 max-w-md mx-auto">Order now and get your favourite snacks delivered fresh. Cash on delivery available.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+            Craving Authentic Bangalore Snacks?
+          </h2>
+          <p className="text-white/80 mb-8 max-w-md mx-auto">
+            Order now and get your favourites delivered fresh today. Cash on delivery — no hassle.
+          </p>
           <Link
             href="/products"
+            id="cta-shop-btn"
             className="inline-flex items-center px-8 py-3.5 bg-white text-brand-primary font-semibold rounded-[var(--radius-md)] hover:bg-white/90 transition-all active:scale-[0.98] shadow-lg"
           >
             Start Shopping

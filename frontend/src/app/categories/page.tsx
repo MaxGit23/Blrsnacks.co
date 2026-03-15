@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { categoriesApi, type Category } from '@/lib/api';
-import { Card, Skeleton } from '@/components/ui';
+import { Card, Skeleton, EmptyState } from '@/components/ui';
+import { Container, PageHeader } from '@/components/layout';
 
 export default function CategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -12,16 +13,16 @@ export default function CategoriesPage() {
     useEffect(() => {
         categoriesApi.getAll()
             .then(setCategories)
-            .catch(() => { })
+            .catch(() => { /* noop */ })
             .finally(() => setIsLoading(false));
     }, []);
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-brand-secondary">Categories</h1>
-                <p className="mt-2 text-text-secondary">Browse our snack collection by category</p>
-            </div>
+        <Container className="py-8 animate-fade-in">
+            <PageHeader
+                title="Browse by Category"
+                description="Find exactly what you're craving — explore our snack categories"
+            />
 
             {isLoading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -30,15 +31,15 @@ export default function CategoriesPage() {
                     ))}
                 </div>
             ) : categories.length === 0 ? (
-                <div className="text-center py-20">
-                    <span className="text-5xl mb-4 block">📂</span>
-                    <h3 className="text-lg font-semibold text-text-primary mb-2">No categories yet</h3>
-                    <p className="text-text-secondary">Check back soon!</p>
-                </div>
+                <EmptyState
+                    icon="📂"
+                    title="No categories yet"
+                    description="We're still setting things up — check back soon for our full snack collection!"
+                />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {categories.map((category) => (
-                        <Link key={category.id} href={`/products?category=${category.slug}`}>
+                        <Link key={category.id} href={`/products?category=${category.slug}`} id={`cat-card-${category.slug}`}>
                             <Card hoverable className="h-full group">
                                 <div className="flex items-start justify-between">
                                     <div>
@@ -46,7 +47,9 @@ export default function CategoriesPage() {
                                             {category.name}
                                         </h3>
                                         {category._count && (
-                                            <p className="text-sm text-text-tertiary mt-1">{category._count.products} products</p>
+                                            <p className="text-sm text-text-tertiary mt-1">
+                                                {category._count.products} product{category._count.products !== 1 ? 's' : ''}
+                                            </p>
                                         )}
                                     </div>
                                     <div className="p-2 rounded-[var(--radius-md)] bg-brand-primary-light text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all">
@@ -72,6 +75,6 @@ export default function CategoriesPage() {
                     ))}
                 </div>
             )}
-        </div>
+        </Container>
     );
 }
