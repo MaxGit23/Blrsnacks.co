@@ -13,10 +13,10 @@ import {
     Logger,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { mkdirSync, existsSync } from 'fs';
+import { memoryStorage } from 'multer';
+import { extname } from 'path';
 import { randomUUID } from 'crypto';
+import { Storage } from '@google-cloud/storage';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, QueryProductDto } from './dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -86,19 +86,7 @@ export class ProductsController {
     @Roles(Role.ADMIN)
     @UseInterceptors(
         FilesInterceptor('images', 10, {
-            storage: diskStorage({
-                destination: (_req, _file, cb) => {
-                    const uploadDir = join(process.cwd(), 'uploads', 'products');
-                    if (!existsSync(uploadDir)) {
-                        mkdirSync(uploadDir, { recursive: true });
-                    }
-                    cb(null, uploadDir);
-                },
-                filename: (_req, file, cb) => {
-                    const uniqueName = `${randomUUID()}${extname(file.originalname)}`;
-                    cb(null, uniqueName);
-                },
-            }),
+            storage: memoryStorage(),
             limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
             fileFilter: (_req, file, cb) => {
                 if (!file.mimetype.match(/^image\/(jpeg|png|webp|avif)$/)) {
@@ -117,9 +105,28 @@ export class ProductsController {
         @UploadedFiles() files: Express.Multer.File[],
         @CurrentUser() user: JwtPayload,
     ) {
-        const imageUrls = files.map(
-            (file) => `/uploads/products/${file.filename}`,
-        );
+        const storage = new Storage();
+        const bucket = storage.bucket('blrsnacks-co-uploads');
+
+        const uploadPromises = files.map((file) => {
+            return new Promise<string>((resolve, reject) => {
+                const uniqueName = `${randomUUID()}${extname(file.originalname)}`;
+                const blob = bucket.file(`products/${uniqueName}`);
+                const blobStream = blob.createWriteStream({
+                    resumable: false,
+                    contentType: file.mimetype,
+                });
+
+                blobStream.on('error', (err) => reject(err));
+                blobStream.on('finish', () => {
+                    resolve(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
+                });
+
+                blobStream.end(file.buffer);
+            });
+        });
+
+        const imageUrls = await Promise.all(uploadPromises);
 
         this.logger.log(`Uploaded ${files.length} images for product ${id}`);
         return this.productsService.updateImages(id, imageUrls, user.sub);

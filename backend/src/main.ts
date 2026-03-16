@@ -52,11 +52,10 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document);
   }
 
-  // Serve uploaded product images at /uploads
-  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
-
   // ─── Admin UI (static single-page panel) ──────────────────────────────────
-  app.useStaticAssets(join(process.cwd(), 'public'), { prefix: '/admin-ui' });
+  try {
+    app.useStaticAssets(join(process.cwd(), 'public'), { prefix: '/admin-ui' });
+  } catch (e) {}
 
   // Redirect bare /admin-ui → /admin-ui/admin.html
   const rawApp = app.getHttpAdapter().getInstance();
