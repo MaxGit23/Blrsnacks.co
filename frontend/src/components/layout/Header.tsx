@@ -44,26 +44,12 @@ export default function Header() {
                             className="flex items-center gap-2 text-xl font-bold text-brand-secondary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded-md"
                         >
 
-                            <span className="tracking-tight hidden sm:block font-mabry">BLR Snacks</span>
+                            <span className="tracking-tight hidden sm:block font-sans font-bold">BLR Snacks</span>
                         </Link>
                     </div>
 
                     {/* Center: Desktop Nav Links */}
                     <div className="hidden lg:flex flex-1 items-center justify-center gap-6 font-mabry">
-                        <Link
-                            href="/"
-                            className="text-sm font-medium text-text-secondary hover:text-brand-primary transition-colors py-2"
-                        >
-                            Home
-                        </Link>
-
-                        <Link
-                            href="/products"
-                            className="text-sm font-medium text-text-secondary hover:text-brand-primary transition-colors py-2 whitespace-nowrap"
-                        >
-                            Shop All
-                        </Link>
-
                         <Link
                             href="/categories/chips"
                             className="text-sm font-medium text-text-secondary hover:text-brand-primary transition-colors py-2 whitespace-nowrap"
@@ -83,6 +69,20 @@ export default function Header() {
                             className="text-sm font-medium text-text-secondary hover:text-brand-primary transition-colors py-2 whitespace-nowrap"
                         >
                             Sweets
+                        </Link>
+
+                        <Link
+                            href="/categories/other-condiments"
+                            className="text-sm font-medium text-text-secondary hover:text-brand-primary transition-colors py-2 whitespace-nowrap"
+                        >
+                            Other Condiments
+                        </Link>
+
+                        <Link
+                            href="/products"
+                            className="text-sm font-medium text-text-secondary hover:text-brand-primary transition-colors py-2 whitespace-nowrap"
+                        >
+                            Shop All
                         </Link>
                     </div>
 
@@ -217,4 +217,3 @@ export default function Header() {
         </div>
     );
 }
-

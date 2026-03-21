@@ -43,6 +43,8 @@ export const productsApi = {
         api.get<Product>(`/products/${slug}`),
 
     // Admin
+    getAllAdmin: (query?: ProductQuery) =>
+        api.get<ApiResponse<Product[]>>('/products/admin/all', query as Record<string, string | number>),
     create: (data: FormData | Record<string, unknown>) =>
         api.post<Product>('/products', data),
 
@@ -54,6 +56,12 @@ export const productsApi = {
 
     uploadImages: (productId: string, formData: FormData) =>
         api.post<Product>(`/products/${productId}/images`, formData),
+
+    updateImages: (productId: string, images: string[]) =>
+        api.put<Product>(`/products/${productId}/images`, { images }),
+
+    deleteImage: (productId: string, imageUrl: string) =>
+        api.delete<Product>(`/products/${productId}/images`, { imageUrl }),
 };
 
 export const categoriesApi = {

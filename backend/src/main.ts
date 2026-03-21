@@ -59,8 +59,10 @@ async function bootstrap() {
 
   // Redirect bare /admin-ui → /admin-ui/admin.html
   const rawApp = app.getHttpAdapter().getInstance();
-  rawApp.get('/admin-ui', (_req: unknown, res: { redirect: (s: string) => void }) =>
-    res.redirect('/admin-ui/admin.html'),
+  rawApp.get(
+    '/admin-ui',
+    (_req: unknown, res: { redirect: (s: string) => void }) =>
+      res.redirect('/admin-ui/admin.html'),
   );
 
   const port = configService.get<number>('PORT');
@@ -68,4 +70,3 @@ async function bootstrap() {
   await app.listen(port ?? process.env.PORT ?? 3001);
 }
 bootstrap();
-

@@ -9,4 +9,4 @@ import { AuthModule } from '../auth/auth.module';
   providers: [AddressService],
   exports: [AddressService],
 })
-export class AddressModule { }
+export class AddressModule {}

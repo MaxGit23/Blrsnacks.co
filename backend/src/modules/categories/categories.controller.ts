@@ -1,13 +1,13 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Put,
-    Delete,
-    Body,
-    Param,
-    UseGuards,
-    Logger,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
@@ -20,49 +20,49 @@ import type { JwtPayload } from '../../common/guards/jwt-auth.guard';
 
 @Controller('categories')
 export class CategoriesController {
-    private readonly logger = new Logger(CategoriesController.name);
+  private readonly logger = new Logger(CategoriesController.name);
 
-    constructor(private readonly categoriesService: CategoriesService) { }
+  constructor(private readonly categoriesService: CategoriesService) {}
 
-    // ─── Public ─────────────────────────────────────────────────────────────────
+  // ─── Public ─────────────────────────────────────────────────────────────────
 
-    @Get()
-    async findAll() {
-        return this.categoriesService.findAll();
-    }
+  @Get()
+  async findAll() {
+    return this.categoriesService.findAll();
+  }
 
-    @Get(':slug')
-    async findBySlug(@Param('slug') slug: string) {
-        return this.categoriesService.findBySlug(slug);
-    }
+  @Get(':slug')
+  async findBySlug(@Param('slug') slug: string) {
+    return this.categoriesService.findBySlug(slug);
+  }
 
-    // ─── Admin ──────────────────────────────────────────────────────────────────
+  // ─── Admin ──────────────────────────────────────────────────────────────────
 
-    @Post()
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    async create(
-        @Body() dto: CreateCategoryDto,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.categoriesService.create(dto, user.sub);
-    }
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async create(
+    @Body() dto: CreateCategoryDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.categoriesService.create(dto, user.sub);
+  }
 
-    @Put(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    async update(
-        @Param('id') id: string,
-        @Body() dto: UpdateCategoryDto,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.categoriesService.update(id, dto, user.sub);
-    }
+  @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateCategoryDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.categoriesService.update(id, dto, user.sub);
+  }
 
-    @Delete(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    async remove(@Param('id') id: string) {
-        return this.categoriesService.softDelete(id);
-    }
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async remove(@Param('id') id: string) {
+    return this.categoriesService.softDelete(id);
+  }
 }

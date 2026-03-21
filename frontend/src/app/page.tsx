@@ -89,8 +89,8 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {[
-              { emoji: '🍌', name: 'Banana Chips', slug: 'banana-chips' },
+              {[
+              { image: '/banana-chips.jpg', name: 'Banana Chips', slug: 'banana-chips' },
               { emoji: '🌶️', name: 'Mixtures', slug: 'mixtures' },
               { emoji: '🥨', name: 'Murukku', slug: 'murukku' },
               { emoji: '🍬', name: 'Sweets', slug: 'sweets' },
@@ -103,7 +103,15 @@ export default function Home() {
                 id={`cat-${cat.slug}`}
                 className="flex flex-col items-center gap-2 p-4 bg-white rounded-[var(--radius-lg)] border border-border-light hover:border-brand-primary/30 hover:shadow-[var(--shadow-md)] transition-all group"
               >
-                <span className="text-3xl group-hover:scale-110 transition-transform">{cat.emoji}</span>
+                {cat.image ? (
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-8 h-8 object-cover rounded-full group-hover:scale-110 transition-transform"
+                  />
+                ) : (
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{cat.emoji}</span>
+                )}
                 <span className="text-sm font-medium text-text-primary group-hover:text-brand-primary transition-colors">{cat.name}</span>
               </Link>
             ))}

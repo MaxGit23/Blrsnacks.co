@@ -1,12 +1,12 @@
 import {
-    Controller,
-    Get,
-    Put,
-    Body,
-    Param,
-    Query,
-    UseGuards,
-    Logger,
+  Controller,
+  Get,
+  Put,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { UpdateInventoryDto } from './dto';
@@ -20,37 +20,37 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, Min } from 'class-validator';
 
 class LowStockQuery {
-    @IsOptional()
-    @Type(() => Number)
-    @IsNumber()
-    @Min(1)
-    threshold?: number;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  threshold?: number;
 }
 
 @Controller('inventory')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class InventoryController {
-    private readonly logger = new Logger(InventoryController.name);
+  private readonly logger = new Logger(InventoryController.name);
 
-    constructor(private readonly inventoryService: InventoryService) { }
+  constructor(private readonly inventoryService: InventoryService) {}
 
-    @Get('low-stock')
-    async getLowStock(@Query() query: LowStockQuery) {
-        return this.inventoryService.getLowStockProducts(query.threshold);
-    }
+  @Get('low-stock')
+  async getLowStock(@Query() query: LowStockQuery) {
+    return this.inventoryService.getLowStockProducts(query.threshold);
+  }
 
-    @Get(':productId')
-    async getByProductId(@Param('productId') productId: string) {
-        return this.inventoryService.getByProductId(productId);
-    }
+  @Get(':productId')
+  async getByProductId(@Param('productId') productId: string) {
+    return this.inventoryService.getByProductId(productId);
+  }
 
-    @Put(':productId')
-    async updateStock(
-        @Param('productId') productId: string,
-        @Body() dto: UpdateInventoryDto,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.inventoryService.updateStock(productId, dto.stock, user.sub);
-    }
+  @Put(':productId')
+  async updateStock(
+    @Param('productId') productId: string,
+    @Body() dto: UpdateInventoryDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.inventoryService.updateStock(productId, dto.stock, user.sub);
+  }
 }

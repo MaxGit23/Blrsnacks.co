@@ -36,4 +36,4 @@ import { HealthModule } from './common/health/health.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

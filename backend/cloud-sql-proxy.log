@@ -1,0 +1,49 @@
+2026/03/17 08:52:05 Authorizing with Application Default Credentials
+2026/03/17 08:52:05 [blrsnacks-co:asia-south1:blrsnacks-db] Listening on 127.0.0.1:3307
+2026/03/17 08:52:05 The proxy has started successfully and is ready for new connections!
+2026/03/17 08:52:29 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:58976
+2026/03/17 08:53:07 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:59201
+2026/03/17 08:53:07 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:59203
+2026/03/17 08:53:07 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:59205
+2026/03/17 08:56:13 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60250
+2026/03/17 08:56:14 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:56:14 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60257
+2026/03/17 08:56:14 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:57:35 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:57:35 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:57:35 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:57:35 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:57:37 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60724
+2026/03/17 08:57:37 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60726
+2026/03/17 08:57:37 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:57:56 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60830
+2026/03/17 08:57:57 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:58:13 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60930
+2026/03/17 08:58:13 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:58:13 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60937
+2026/03/17 08:58:14 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60944
+2026/03/17 08:58:19 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:58:20 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:60976
+2026/03/17 08:58:24 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:58:25 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:58:26 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:58:28 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:61025
+2026/03/17 08:58:28 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 08:58:29 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:61031
+2026/03/17 09:00:02 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:61519
+2026/03/17 09:04:13 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:61923
+2026/03/17 09:04:13 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 09:04:32 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:61976
+2026/03/17 09:04:32 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:61979
+2026/03/17 09:07:42 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:62404
+2026/03/17 09:07:42 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 09:07:42 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:62407
+2026/03/17 09:09:14 [blrsnacks-co:asia-south1:blrsnacks-db] Accepted connection from 127.0.0.1:62545
+2026/03/17 09:09:14 [blrsnacks-co:asia-south1:blrsnacks-db] client closed the connection
+2026/03/17 10:04:17 [blrsnacks-co:asia-south1:blrsnacks-db] connection aborted - error reading from instance: read tcp 192.168.1.38:61980->34.93.181.237:3307: read: connection reset by peer
+2026/03/17 10:04:34 [blrsnacks-co:asia-south1:blrsnacks-db] connection aborted - error reading from instance: read tcp 192.168.1.38:62546->34.93.181.237:3307: read: connection reset by peer
+2026/03/17 10:04:46 [blrsnacks-co:asia-south1:blrsnacks-db] connection aborted - error reading from instance: read tcp 192.168.1.38:62405->34.93.181.237:3307: read: connection reset by peer
+2026/03/17 10:04:46 [blrsnacks-co:asia-south1:blrsnacks-db] connection aborted - error reading from instance: read tcp 192.168.1.38:62408->34.93.181.237:3307: read: connection reset by peer
+2026/03/17 10:04:46 [blrsnacks-co:asia-south1:blrsnacks-db] connection aborted - error reading from instance: read tcp 192.168.1.38:61978->34.93.181.237:3307: read: connection reset by peer
+2026/03/18 17:23:18 Sending SIGTERM signal for proxy to shutdown.
+2026/03/18 17:23:18 SIGTERM signal received. Shutting down...

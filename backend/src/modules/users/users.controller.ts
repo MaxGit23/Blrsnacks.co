@@ -9,26 +9,26 @@ import type { JwtPayload } from '../../common/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
-    private readonly logger = new Logger(UsersController.name);
+  private readonly logger = new Logger(UsersController.name);
 
-    constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
-    // ─── Protected: Get current user profile ─────────────────────────────────
+  // ─── Protected: Get current user profile ─────────────────────────────────
 
-    @Get('me')
-    @UseGuards(JwtAuthGuard)
-    async getProfile(@CurrentUser() user: JwtPayload) {
-        this.logger.log(`Profile requested by user: ${user.sub}`);
-        return this.usersService.getProfile(user.sub);
-    }
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@CurrentUser() user: JwtPayload) {
+    this.logger.log(`Profile requested by user: ${user.sub}`);
+    return this.usersService.getProfile(user.sub);
+  }
 
-    // ─── Admin Only: List all users ──────────────────────────────────────────
+  // ─── Admin Only: List all users ──────────────────────────────────────────
 
-    @Get()
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
-    async findAll() {
-        this.logger.log('Admin requested all users');
-        return this.usersService.findAll();
-    }
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async findAll() {
+    this.logger.log('Admin requested all users');
+    return this.usersService.findAll();
+  }
 }

@@ -1,13 +1,13 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Put,
-    Param,
-    Query,
-    Body,
-    UseGuards,
-    Logger,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Param,
+  Query,
+  Body,
+  UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderStatusDto, QueryOrderDto } from './dto';
@@ -21,68 +21,65 @@ import type { JwtPayload } from '../../common/guards/jwt-auth.guard';
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
 export class OrdersController {
-    private readonly logger = new Logger(OrdersController.name);
+  private readonly logger = new Logger(OrdersController.name);
 
-    constructor(private readonly ordersService: OrdersService) { }
+  constructor(private readonly ordersService: OrdersService) {}
 
-    // ─── Customer Endpoints ────────────────────────────────────────────────────
+  // ─── Customer Endpoints ────────────────────────────────────────────────────
 
-    @Post()
-    async placeOrder(
-        @Body() dto: CreateOrderDto,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.ordersService.placeOrder(dto, user.sub);
-    }
+  @Post()
+  async placeOrder(
+    @Body() dto: CreateOrderDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.ordersService.placeOrder(dto, user.sub);
+  }
 
-    @Get('me')
-    async getMyOrders(
-        @Query() query: QueryOrderDto,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.ordersService.getUserOrders(user.sub, query);
-    }
+  @Get('me')
+  async getMyOrders(
+    @Query() query: QueryOrderDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.ordersService.getUserOrders(user.sub, query);
+  }
 
-    @Get('me/:id')
-    async getMyOrder(
-        @Param('id') id: string,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.ordersService.getOrderById(id, user.sub);
-    }
+  @Get('me/:id')
+  async getMyOrder(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.ordersService.getOrderById(id, user.sub);
+  }
 
-    @Post('me/:id/cancel')
-    async cancelMyOrder(
-        @Param('id') id: string,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.ordersService.cancelOrder(id, user.sub);
-    }
+  @Post('me/:id/cancel')
+  async cancelMyOrder(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.ordersService.cancelOrder(id, user.sub);
+  }
 
-    // ─── Admin Endpoints ──────────────────────────────────────────────────────
+  // ─── Admin Endpoints ──────────────────────────────────────────────────────
 
-    @Get()
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    async getAllOrders(@Query() query: QueryOrderDto) {
-        return this.ordersService.getAllOrders(query);
-    }
+  @Get()
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  async getAllOrders(@Query() query: QueryOrderDto) {
+    return this.ordersService.getAllOrders(query);
+  }
 
-    @Get(':id')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    async getOrder(@Param('id') id: string) {
-        return this.ordersService.getOrderById(id);
-    }
+  @Get(':id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  async getOrder(@Param('id') id: string) {
+    return this.ordersService.getOrderById(id);
+  }
 
-    @Put(':id/status')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    async updateStatus(
-        @Param('id') id: string,
-        @Body() dto: UpdateOrderStatusDto,
-        @CurrentUser() user: JwtPayload,
-    ) {
-        return this.ordersService.updateStatus(id, dto, user.sub);
-    }
+  @Put(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateOrderStatusDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.ordersService.updateStatus(id, dto, user.sub);
+  }
 }

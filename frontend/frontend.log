@@ -1,0 +1,66 @@
+
+> frontend@0.1.0 dev
+> next dev --port 3002
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/shivaprasad/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/shivaprasad/Documents/Blrsnacks.co/frontend/package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.1.38:3002
+- Environments: .env.local
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 818ms
+ GET /admin 200 in 1875ms (compile: 1633ms, proxy.ts: 49ms, render: 192ms)
+ GET /admin/products 200 in 276ms (compile: 256ms, proxy.ts: 6ms, render: 15ms)
+ GET /admin/inventory 200 in 212ms (compile: 195ms, proxy.ts: 3ms, render: 14ms)
+ GET /admin/products 200 in 29ms (compile: 5ms, proxy.ts: 6ms, render: 18ms)
+✓ Compiled in 90ms
+ GET /admin/products 200 in 169ms (compile: 57ms, proxy.ts: 10ms, render: 103ms)
+ GET /admin/products 200 in 89ms (compile: 7ms, proxy.ts: 15ms, render: 67ms)
+ GET /admin/inventory 200 in 59ms (compile: 14ms, proxy.ts: 17ms, render: 28ms)
+ GET /admin/products 200 in 45ms (compile: 14ms, proxy.ts: 7ms, render: 24ms)
+ GET /admin/inventory 200 in 36ms (compile: 7ms, proxy.ts: 9ms, render: 20ms)
+ GET /admin/orders 200 in 323ms (compile: 302ms, proxy.ts: 7ms, render: 14ms)
+ GET /admin/products 200 in 24ms (compile: 5ms, proxy.ts: 3ms, render: 16ms)
+ GET /admin/products 200 in 32ms (compile: 5ms, proxy.ts: 6ms, render: 21ms)
+ GET / 200 in 234ms (compile: 205ms, render: 29ms)
+ GET /products 200 in 271ms (compile: 253ms, render: 17ms)
+ GET /categories/chips 404 in 230ms (compile: 216ms, render: 14ms)
+ GET /categories/chips 404 in 61ms (compile: 9ms, render: 53ms)
+ GET /categories/mixtures 404 in 36ms (compile: 8ms, render: 28ms)
+ GET /categories/mixtures 404 in 45ms (compile: 6ms, render: 39ms)
+ GET /categories/sweets 404 in 22ms (compile: 5ms, render: 17ms)
+ GET /categories/sweets 404 in 54ms (compile: 10ms, render: 45ms)
+ GET /products 200 in 25ms (compile: 6ms, render: 18ms)
+ GET /products 200 in 36ms (compile: 20ms, render: 16ms)
+ GET /products 200 in 146ms (compile: 9ms, render: 137ms)
+ GET /admin/orders 200 in 87ms (compile: 7ms, proxy.ts: 6ms, render: 74ms)
+ GET /admin/products 200 in 35ms (compile: 5ms, proxy.ts: 7ms, render: 22ms)
+ GET /products 200 in 46ms (compile: 5ms, render: 41ms)
+ GET /admin/products 200 in 33ms (compile: 7ms, proxy.ts: 6ms, render: 19ms)
+ GET /admin/inventory 200 in 38ms (compile: 7ms, proxy.ts: 7ms, render: 24ms)
+ GET /admin/products 200 in 32ms (compile: 6ms, proxy.ts: 7ms, render: 19ms)
+ GET /admin/inventory 200 in 27ms (compile: 5ms, proxy.ts: 4ms, render: 18ms)
+ GET /admin/products 200 in 36ms (compile: 8ms, proxy.ts: 7ms, render: 21ms)
+ GET /admin 200 in 35ms (compile: 7ms, proxy.ts: 7ms, render: 20ms)
+ GET /admin/products 200 in 32ms (compile: 7ms, proxy.ts: 7ms, render: 18ms)
+ GET /admin/orders 200 in 25ms (compile: 4ms, proxy.ts: 6ms, render: 15ms)
+ GET /admin/inventory 200 in 38ms (compile: 7ms, proxy.ts: 6ms, render: 24ms)
+ GET /admin/products 200 in 26ms (compile: 5ms, proxy.ts: 4ms, render: 17ms)
+ GET /admin/inventory 200 in 54ms (compile: 11ms, proxy.ts: 11ms, render: 33ms)
+ GET /admin/orders 200 in 36ms (compile: 7ms, proxy.ts: 6ms, render: 23ms)
+ GET /admin/customers 200 in 284ms (compile: 261ms, proxy.ts: 7ms, render: 16ms)
+ GET /admin 200 in 29ms (compile: 7ms, proxy.ts: 6ms, render: 16ms)
+ GET /admin/products 200 in 31ms (compile: 7ms, proxy.ts: 6ms, render: 18ms)
+✓ Compiled in 35ms
+✓ Compiled in 54ms
+ GET /products 200 in 218ms (compile: 103ms, render: 115ms)
+ GET / 200 in 126ms (compile: 76ms, render: 50ms)
+ GET /categories 200 in 246ms (compile: 235ms, render: 11ms)

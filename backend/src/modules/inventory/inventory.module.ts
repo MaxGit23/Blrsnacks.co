@@ -9,4 +9,4 @@ import { AuthModule } from '../auth/auth.module';
   providers: [InventoryService],
   exports: [InventoryService],
 })
-export class InventoryModule { }
+export class InventoryModule {}

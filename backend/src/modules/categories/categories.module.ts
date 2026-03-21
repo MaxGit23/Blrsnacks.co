@@ -4,9 +4,9 @@ import { CategoriesService } from './categories.service';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-    imports: [AuthModule],
-    controllers: [CategoriesController],
-    providers: [CategoriesService],
-    exports: [CategoriesService],
+  imports: [AuthModule],
+  controllers: [CategoriesController],
+  providers: [CategoriesService],
+  exports: [CategoriesService],
 })
-export class CategoriesModule { }
+export class CategoriesModule {}
