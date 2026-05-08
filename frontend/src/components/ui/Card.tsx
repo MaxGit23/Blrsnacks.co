@@ -1,8 +1,11 @@
+import type { ReactNode } from 'react';
+
 interface CardProps {
-    children: React.ReactNode;
+    children: ReactNode;
     className?: string;
     hoverable?: boolean;
     padding?: 'none' | 'sm' | 'md' | 'lg';
+    variant?: 'default' | 'elevated' | 'outline';
 }
 
 const paddingClasses = {
@@ -12,18 +15,24 @@ const paddingClasses = {
     lg: 'p-6',
 };
 
+const variantClasses = {
+    default: 'bg-white border border-slate-200 shadow-sm',
+    elevated: 'bg-white shadow-xl border-0',
+    outline: 'bg-transparent border border-slate-200',
+};
+
 export default function Card({
     children,
     className = '',
     hoverable = false,
     padding = 'md',
+    variant = 'default',
 }: CardProps) {
     return (
         <div
             className={`
-        bg-white rounded-[var(--radius-lg)] border border-border-light
-        shadow-[var(--shadow-sm)]
-        ${hoverable ? 'transition-all duration-[var(--transition-base)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5' : ''}
+        rounded-xl ${variantClasses[variant]}
+        ${hoverable ? 'transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5 hover:border-red-200 cursor-pointer' : ''}
         ${paddingClasses[padding]}
         ${className}
       `}

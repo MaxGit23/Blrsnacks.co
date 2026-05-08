@@ -1,0 +1,10 @@
+# MemPalace Config for Blrsnacks Frontend
+# This is a Next.js frontend for a grocery/snacks e-commerce platform
+
+wing: wing_frontend
+rooms:
+  - components
+  - pages
+  - hooks
+  - types
+  - utils

@@ -53,13 +53,15 @@ export default function RegisterPage() {
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-block text-3xl mb-4">🍌</Link>
-                    <h1 className="text-2xl font-bold text-brand-secondary">Join BLR Snacks</h1>
-                    <p className="text-text-secondary mt-2">Create your account and start ordering fresh snacks today</p>
+                    <Link href="/" className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-amber-500 mb-4 shadow-lg">
+                        <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    </Link>
+                    <h1 className="text-2xl font-bold text-stone-900 font-display">Join BLR Snacks</h1>
+                    <p className="text-stone-500 mt-2 font-body">Create your account and start ordering fresh snacks today</p>
                 </div>
 
                 {/* Form Card */}
-                <div className="bg-white border border-border-light rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] p-8">
+                <div className="bg-white border border-stone-200 rounded-2xl shadow-lg p-8">
                     {errors.general && (
                         <div className="mb-6 px-4 py-3 bg-error-light text-error text-sm rounded-[var(--radius-md)]" role="alert">
                             {errors.general}
@@ -108,14 +110,14 @@ export default function RegisterPage() {
                             <div className="w-full border-t border-border-light" />
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white px-3 text-text-tertiary">or continue with</span>
+                            <span className="bg-white px-3 text-stone-400">or continue with</span>
                         </div>
                     </div>
 
                     <button
                         id="google-register-btn"
                         type="button"
-                        className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border-default rounded-[var(--radius-md)] text-sm font-medium text-text-primary hover:bg-bg-tertiary transition-colors"
+                        className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-stone-200 rounded-xl text-sm font-medium text-stone-700 hover:bg-stone-50 hover:border-red-300 transition-all duration-200 cursor-pointer"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -130,7 +132,7 @@ export default function RegisterPage() {
                 {/* Footer */}
                 <p className="text-center text-sm text-text-secondary mt-6">
                     Already have an account?{' '}
-                    <Link href="/login" className="font-semibold text-brand-primary hover:text-brand-primary-hover transition-colors">
+                    <Link href="/login" className="font-semibold text-red-600 hover:text-red-700 transition-colors cursor-pointer">
                         Sign in
                     </Link>
                 </p>

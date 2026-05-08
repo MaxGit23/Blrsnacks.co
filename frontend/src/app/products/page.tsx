@@ -188,12 +188,20 @@ function ProductsContent() {
 }
 
 function ProductCard({ product }: { product: Product }) {
-    const inStock = true; // Override to ALWAYS show in stock
+    const inStock = true;
+    const [isAdding, setIsAdding] = useState(false);
+
+    const handleAddToCart = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsAdding(true);
+        // Add to cart logic would go here
+        setTimeout(() => setIsAdding(false), 500);
+    };
 
     return (
         <Link href={`/products/${product.slug}`} id={`product-${product.slug}`}>
             <Card hoverable padding="none" className="overflow-hidden group">
-                {/* Image */}
                 <div className="relative h-48 bg-bg-secondary flex items-center justify-center overflow-hidden">
                     {product.images.length > 0 ? (
                         <img
@@ -214,8 +222,24 @@ function ProductCard({ product }: { product: Product }) {
                             <Badge variant="error">Sold Out</Badge>
                         </div>
                     )}
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={!inStock || isAdding}
+                        className="absolute bottom-3 right-3 p-2 rounded-full bg-white shadow-md text-brand-primary hover:bg-brand-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={`Add ${product.name} to cart`}
+                    >
+                        {isAdding ? (
+                            <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                        ) : (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0-15l-6.75 6.75M12 4.5l6.75 6.75" />
+                            </svg>
+                        )}
+                    </button>
                 </div>
-                {/* Info */}
                 <div className="p-4">
                     <div className="text-xs text-text-tertiary uppercase tracking-wide mb-1">{product.category?.name}</div>
                     <h3 className="text-sm font-semibold text-text-primary group-hover:text-brand-primary transition-colors line-clamp-1">
