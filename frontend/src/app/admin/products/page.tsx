@@ -184,7 +184,7 @@ export default function AdminProductsPage() {
             const updated = await productsApi.deleteImage(editingProduct.id, imageUrl);
             setExistingImages(updated.images || []);
             addToast('Image removed', 'success');
-            fetchProducts(); // Refresh product list to reflect updated images
+            fetchProducts();
         } catch (error) {
             console.error('Delete image error', error);
             addToast('Failed to remove image', 'error');

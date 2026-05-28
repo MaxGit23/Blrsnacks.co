@@ -14,9 +14,8 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { join } from 'path';
-import { writeFile, mkdir } from 'fs/promises';
 import { randomUUID } from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, QueryProductDto } from './dto';
@@ -26,6 +25,21 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Role } from '@prisma/client';
 import type { JwtPayload } from '../../common/guards/jwt-auth.guard';
+
+const STORAGE_BUCKET = 'product-images';
+
+function getSupabaseAdmin() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error(
+      'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in backend .env',
+    );
+  }
+  return createClient(url, key, {
+    auth: { persistSession: false },
+  });
+}
 
 @Controller('products')
 export class ProductsController {
@@ -103,20 +117,33 @@ export class ProductsController {
     @UploadedFiles() files: Express.Multer.File[],
     @CurrentUser() user: JwtPayload,
   ) {
-    const uploadDir = join(process.cwd(), 'uploads', 'products');
-    await mkdir(uploadDir, { recursive: true });
+    const supabase = getSupabaseAdmin();
 
     const uploadPromises = files.map(async (file) => {
-      const ext = file.originalname.split('.').pop();
-      const uniqueName = `${randomUUID()}.${ext}`;
-      const filePath = join(uploadDir, uniqueName);
-      await writeFile(filePath, file.buffer);
-      return `/uploads/products/${uniqueName}`;
+      const ext = file.originalname.split('.').pop()?.toLowerCase() ?? 'jpg';
+      const path = `products/${id}/${randomUUID()}.${ext}`;
+
+      const { error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(path, file.buffer, {
+          contentType: file.mimetype,
+          upsert: false,
+        });
+
+      if (error) {
+        throw new Error(`Supabase upload failed for ${file.originalname}: ${error.message}`);
+      }
+
+      const { data } = supabase.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(path);
+
+      return data.publicUrl;
     });
 
     const imageUrls = await Promise.all(uploadPromises);
 
-    this.logger.log(`Uploaded ${files.length} images for product ${id}`);
+    this.logger.log(`Uploaded ${files.length} image(s) to Supabase Storage for product ${id}`);
     return this.productsService.addImages(id, imageUrls, user.sub);
   }
 
