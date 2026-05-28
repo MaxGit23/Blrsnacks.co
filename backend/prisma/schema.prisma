@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -48,9 +49,9 @@ model Session {
   id                String   @id @default(uuid())
   userId            String
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshTokenHash  String   @db.VarChar(255)
-  userAgent         String?  @db.VarChar(512)
-  ipAddress         String?  @db.VarChar(45)
+  refreshTokenHash  String
+  userAgent         String?
+  ipAddress         String?
   expiresAt         DateTime
 
   createdAt         DateTime @default(now())
@@ -108,7 +109,7 @@ model Product {
   id          String  @id @default(uuid())
   name        String
   slug        String  @unique
-  description String  @db.Text
+  description String
   price       Decimal @db.Decimal(10, 2)
   images      Json
   isPublished Boolean @default(false)
@@ -205,7 +206,7 @@ model OrderStatusHistory {
   orderId   String
   order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
   status    OrderStatus
-  notes     String?     @db.Text
+  notes     String?
   createdBy String?
   createdAt DateTime    @default(now())
 

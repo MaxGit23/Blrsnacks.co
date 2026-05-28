@@ -1,31 +1,10 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # Blrsnacks.co — Docker Compose (Production)
+# Database: Supabase (external managed PostgreSQL — no local DB container needed)
 # Usage: docker compose -f docker-compose.yml up -d
 # ──────────────────────────────────────────────────────────────────────────────
 
 services:
-  # ─── MySQL Database ────────────────────────────────────────────────────────
-  db:
-    image: mysql:8.0
-    container_name: blrsnacks-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-blrsnacks}
-      MYSQL_USER: ${MYSQL_USER:-blrsnacks}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - blrsnacks
-
   # ─── NestJS Backend API ────────────────────────────────────────────────────
   api:
     build:
@@ -33,13 +12,11 @@ services:
       dockerfile: Dockerfile
     container_name: blrsnacks-api
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3001
-      DATABASE_URL: mysql://${MYSQL_USER:-blrsnacks}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE:-blrsnacks}
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-900}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
@@ -54,18 +31,16 @@ services:
     networks:
       - blrsnacks
 
-  # ─── Prisma Migrations (run once) ─────────────────────────────────────────
+  # ─── Prisma Migrations (run once against Supabase direct connection) ───────
   migrate:
     build:
       context: ./backend
       dockerfile: Dockerfile
       target: builder
     container_name: blrsnacks-migrate
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      DATABASE_URL: mysql://${MYSQL_USER:-blrsnacks}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE:-blrsnacks}
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
     command: npx prisma migrate deploy
     networks:
       - blrsnacks
@@ -73,8 +48,6 @@ services:
       - migrate
 
 volumes:
-  mysql_data:
-    driver: local
   uploads:
     driver: local
 

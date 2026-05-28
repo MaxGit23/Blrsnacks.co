@@ -14,9 +14,10 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { extname } from 'path';
+import { join } from 'path';
+import { writeFile, mkdir } from 'fs/promises';
 import { randomUUID } from 'crypto';
-import { Storage } from '@google-cloud/storage';
+
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, QueryProductDto } from './dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -102,25 +103,15 @@ export class ProductsController {
     @UploadedFiles() files: Express.Multer.File[],
     @CurrentUser() user: JwtPayload,
   ) {
-    const storage = new Storage();
-    const bucket = storage.bucket('blrsnacks-co-uploads');
+    const uploadDir = join(process.cwd(), 'uploads', 'products');
+    await mkdir(uploadDir, { recursive: true });
 
-    const uploadPromises = files.map((file) => {
-      return new Promise<string>((resolve, reject) => {
-        const uniqueName = `${randomUUID()}${extname(file.originalname)}`;
-        const blob = bucket.file(`products/${uniqueName}`);
-        const blobStream = blob.createWriteStream({
-          resumable: false,
-          contentType: file.mimetype,
-        });
-
-        blobStream.on('error', (err) => reject(err));
-        blobStream.on('finish', () => {
-          resolve(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
-        });
-
-        blobStream.end(file.buffer);
-      });
+    const uploadPromises = files.map(async (file) => {
+      const ext = file.originalname.split('.').pop();
+      const uniqueName = `${randomUUID()}.${ext}`;
+      const filePath = join(uploadDir, uniqueName);
+      await writeFile(filePath, file.buffer);
+      return `/uploads/products/${uniqueName}`;
     });
 
     const imageUrls = await Promise.all(uploadPromises);

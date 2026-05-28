@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { createClient } from '@/utils/supabase/middleware';
 
 /**
  * Route protection middleware.
@@ -19,7 +20,10 @@ function isPathMatch(pathname: string, paths: string[]): boolean {
     );
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+    // Keep session refreshed via Supabase client
+    const supabaseResponse = await createClient(request);
+
     const { pathname } = request.nextUrl;
     const hasToken = request.cookies.has('access_token');
 
@@ -42,7 +46,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    return NextResponse.next();
+    return supabaseResponse;
 }
 
 export const config = {
