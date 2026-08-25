@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
+import { DEMO_PRODUCTS } from '@/lib/mock-products';
+import { getImageUrl } from '@/lib/images';
+import { formatPrice } from '@/lib/format';
 
 const navLinks = [
   { href: '/products', label: 'Shop All' },
@@ -20,7 +23,20 @@ export default function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [query, setQuery] = useState('');
+    const [activeIdx, setActiveIdx] = useState(-1);
     const searchInputRef = useRef<HTMLInputElement>(null);
+
+    // Live product matches for the search popover
+    const results = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return [];
+        return DEMO_PRODUCTS.filter(
+            (p) =>
+                p.name.toLowerCase().includes(q) ||
+                p.description.toLowerCase().includes(q) ||
+                p.category.name.toLowerCase().includes(q),
+        ).slice(0, 5);
+    }, [query]);
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 10);
@@ -44,16 +60,26 @@ export default function Header() {
 
     const submitSearch = useCallback((e: React.FormEvent) => {
         e.preventDefault();
-        const q = query.trim();
-        if (!q) return;
-        router.push(`/products?search=${encodeURIComponent(q)}`);
+        if (activeIdx >= 0 && results[activeIdx]) {
+            router.push(`/products/${results[activeIdx].slug}`);
+        } else {
+            const q = query.trim();
+            if (!q) return;
+            router.push(`/products?search=${encodeURIComponent(q)}`);
+        }
         setSearchOpen(false);
         setQuery('');
-    }, [query, router]);
+        setActiveIdx(-1);
+    }, [query, activeIdx, results, router]);
 
     const closeSearch = useCallback(() => {
         setSearchOpen(false);
         searchInputRef.current?.blur();
+    }, []);
+
+    const openSearch = useCallback(() => {
+        setActiveIdx(-1);
+        setSearchOpen((o) => !o);
     }, []);
 
     return (
@@ -101,30 +127,27 @@ export default function Header() {
                         {/* Search */}
                         <button
                             id="header-search-trigger"
-                            className="hidden sm:flex p-2.5 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-200 cursor-pointer"
+                            className={`hidden sm:flex p-2.5 rounded-full transition-colors duration-200 cursor-pointer ${searchOpen ? 'text-red-600 bg-red-50' : 'text-stone-500 hover:text-red-600 hover:bg-red-50'}`}
                             aria-label="Search"
                             aria-expanded={searchOpen}
                             aria-controls="header-search"
-                            onClick={() => setSearchOpen((o) => !o)}
+                            onClick={openSearch}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
 
-                        {/* Search Popover */}
-                        {searchOpen && (
-                            <div
-                                id="header-search"
-                                role="search"
-                                className="absolute right-0 top-full mt-2 w-72 z-50 animate-fade-in-down"
-                                style={{ transformOrigin: 'top right' }}
-                            >
-                                <form
-                                    onSubmit={submitSearch}
-                                    className="glass rounded-xl shadow-lg border border-stone-200/60 p-2 flex items-center gap-1.5"
-                                >
-                                    <svg className="w-4 h-4 text-text-tertiary shrink-0 ml-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        {/* Search Popover — translucent material anchored to its trigger */}
+                        <div
+                            id="header-search"
+                            role="search"
+                            data-open={searchOpen}
+                            className="search-panel absolute right-0 top-full mt-3 w-[22rem] max-w-[calc(100vw-2rem)] z-50"
+                        >
+                            <div className="surface-popover rounded-2xl overflow-hidden">
+                                <form onSubmit={submitSearch} className="flex items-center gap-2.5 px-4 py-3.5">
+                                    <svg className="w-[18px] h-[18px] text-text-tertiary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                     <input
@@ -132,29 +155,95 @@ export default function Header() {
                                         autoFocus
                                         type="text"
                                         value={query}
-                                        onChange={(e) => setQuery(e.target.value)}
+                                        onChange={(e) => {
+                                            setQuery(e.target.value);
+                                            setActiveIdx(-1);
+                                        }}
                                         onKeyDown={(e) => {
-                                            if (e.key === 'Escape') closeSearch();
+                                            if (e.key === 'Escape') {
+                                                closeSearch();
+                                                return;
+                                            }
+                                            if (e.key === 'ArrowDown') {
+                                                e.preventDefault();
+                                                setActiveIdx((i) => Math.min(i + 1, results.length));
+                                            } else if (e.key === 'ArrowUp') {
+                                                e.preventDefault();
+                                                setActiveIdx((i) => Math.max(i - 1, -1));
+                                            }
                                         }}
                                         placeholder="Search snacks..."
                                         aria-label="Search snacks"
+                                        aria-controls="header-search-results"
                                         enterKeyHint="search"
                                         autoComplete="off"
-                                        className="flex-1 min-w-0 py-1.5 text-sm bg-transparent focus:outline-none text-text-primary placeholder:text-text-tertiary font-body"
+                                        role="combobox"
+                                        aria-expanded={searchOpen}
+                                        className="flex-1 min-w-0 bg-transparent text-[15px] font-medium tracking-[-0.01em] text-text-primary placeholder:font-normal placeholder:text-text-tertiary focus:outline-none font-body"
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={closeSearch}
-                                        aria-label="Close search"
-                                        className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-full transition-colors duration-200 cursor-pointer"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                                    <kbd className="hidden sm:inline-flex items-center px-1.5 h-5 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary border border-border-light rounded-md select-none">
+                                        Esc
+                                    </kbd>
                                 </form>
+
+                                {query.trim() !== '' && (
+                                    <div id="header-search-results" className="border-t border-black/5 py-1.5">
+                                        {results.map((p, i) => (
+                                            <Link
+                                                key={p.id}
+                                                href={`/products/${p.slug}`}
+                                                onClick={() => setSearchOpen(false)}
+                                                onMouseEnter={() => setActiveIdx(i)}
+                                                className={`mx-1.5 flex items-center gap-3 px-2.5 py-2 rounded-xl transition-colors duration-150 ${activeIdx === i ? 'bg-brand-primary-light' : ''}`}
+                                            >
+                                                {p.images[0] ? (
+                                                    <img
+                                                        src={getImageUrl(p.images[0])}
+                                                        alt=""
+                                                        className="w-10 h-10 rounded-lg object-cover bg-bg-secondary shrink-0"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    <span className="w-10 h-10 rounded-lg bg-bg-secondary shrink-0" />
+                                                )}
+                                                <span className="min-w-0 flex-1">
+                                                    <span className="block text-sm font-semibold tracking-[-0.01em] text-text-primary truncate">
+                                                        {p.name}
+                                                    </span>
+                                                    <span className="block text-xs text-text-tertiary truncate">
+                                                        {p.category.name}
+                                                    </span>
+                                                </span>
+                                                <span className="text-sm font-bold text-brand-primary shrink-0">
+                                                    {formatPrice(p.price)}
+                                                </span>
+                                            </Link>
+                                        ))}
+
+                                        {results.length > 0 && (
+                                            <button
+                                                type="submit"
+                                                className={`mx-1.5 mt-0.5 w-[calc(100%-0.75rem)] flex items-center justify-between px-2.5 py-2.5 rounded-xl text-sm transition-colors duration-150 cursor-pointer ${activeIdx === results.length ? 'bg-brand-primary-light' : 'hover:bg-bg-tertiary'}`}
+                                            >
+                                                <span className="font-medium text-brand-primary truncate">
+                                                    See all results for “{query.trim()}”
+                                                </span>
+                                                <svg className="w-3.5 h-3.5 text-brand-primary shrink-0 ml-2" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                                </svg>
+                                            </button>
+                                        )}
+
+                                        {results.length === 0 && (
+                                            <p className="px-4 py-3 text-sm text-text-secondary">
+                                                No matches for “{query.trim()}” — press Enter to search everything.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
+
 
                         {/* Mobile Menu Toggle */}
                         <button
