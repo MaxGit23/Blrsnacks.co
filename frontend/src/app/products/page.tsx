@@ -32,6 +32,11 @@ function ProductsContent() {
 
     const debouncedSearch = useDebounce(search, 400);
 
+    // Keep local state in sync when the URL query changes (e.g. header search)
+    useEffect(() => {
+        setSearch(searchParams.get('search') ?? '');
+    }, [searchParams]);
+
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
         let list: Product[] = [];

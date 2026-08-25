@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 
 const navLinks = [
@@ -14,13 +15,45 @@ const navLinks = [
 
 export default function Header() {
     const { user, isAuthenticated } = useAuth();
+    const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [query, setQuery] = useState('');
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 10);
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    // Close the search popover on outside pointer press
+    useEffect(() => {
+        if (!searchOpen) return;
+        const onDown = (e: PointerEvent) => {
+            const panel = document.getElementById('header-search');
+            const trigger = document.getElementById('header-search-trigger');
+            if (panel && !panel.contains(e.target as Node) && trigger && !trigger.contains(e.target as Node)) {
+                setSearchOpen(false);
+            }
+        };
+        document.addEventListener('pointerdown', onDown);
+        return () => document.removeEventListener('pointerdown', onDown);
+    }, [searchOpen]);
+
+    const submitSearch = useCallback((e: React.FormEvent) => {
+        e.preventDefault();
+        const q = query.trim();
+        if (!q) return;
+        router.push(`/products?search=${encodeURIComponent(q)}`);
+        setSearchOpen(false);
+        setQuery('');
+    }, [query, router]);
+
+    const closeSearch = useCallback(() => {
+        setSearchOpen(false);
+        searchInputRef.current?.blur();
     }, []);
 
     return (
@@ -64,16 +97,64 @@ export default function Header() {
                     </div>
 
                     {/* Right Actions */}
-                    <div className="flex items-center gap-1.5">
+                    <div className="relative flex items-center gap-1.5">
                         {/* Search */}
-                        <button 
-                            className="hidden sm:flex p-2.5 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 cursor-pointer" 
+                        <button
+                            id="header-search-trigger"
+                            className="hidden sm:flex p-2.5 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors duration-200 cursor-pointer"
                             aria-label="Search"
+                            aria-expanded={searchOpen}
+                            aria-controls="header-search"
+                            onClick={() => setSearchOpen((o) => !o)}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
+
+                        {/* Search Popover */}
+                        {searchOpen && (
+                            <div
+                                id="header-search"
+                                role="search"
+                                className="absolute right-0 top-full mt-2 w-72 z-50 animate-fade-in-down"
+                                style={{ transformOrigin: 'top right' }}
+                            >
+                                <form
+                                    onSubmit={submitSearch}
+                                    className="glass rounded-xl shadow-lg border border-stone-200/60 p-2 flex items-center gap-1.5"
+                                >
+                                    <svg className="w-4 h-4 text-text-tertiary shrink-0 ml-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <input
+                                        ref={searchInputRef}
+                                        autoFocus
+                                        type="text"
+                                        value={query}
+                                        onChange={(e) => setQuery(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Escape') closeSearch();
+                                        }}
+                                        placeholder="Search snacks..."
+                                        aria-label="Search snacks"
+                                        enterKeyHint="search"
+                                        autoComplete="off"
+                                        className="flex-1 min-w-0 py-1.5 text-sm bg-transparent focus:outline-none text-text-primary placeholder:text-text-tertiary font-body"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={closeSearch}
+                                        aria-label="Close search"
+                                        className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-full transition-colors duration-200 cursor-pointer"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        )}
 
                         {/* Mobile Menu Toggle */}
                         <button
