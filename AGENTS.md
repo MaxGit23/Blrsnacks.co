@@ -24,3 +24,12 @@ Only inspect files relevant to the requested task.
 * **Brevity:** Keep your responses concise. Do not explain standard framework concepts unless asked.
 * **Architectural Integrity:** Preserve the existing architecture. Follow the patterns outlined in `PROJECT_CONTEXT.md`.
 * **Completion Protocol:** When you finish a significant task, you MUST update `CURRENT_STATE.md` and `TASKS.md` to reflect your changes before ending the session.
+
+## Design & UI Rules (MANDATORY)
+Any change that touches frontend UI — components, pages, styles, animations, interactions — MUST follow the design-engineering skills installed at `.agents/skills/`:
+
+1. **Read `.agents/skills/emil-design-eng/SKILL.md` before writing any UI code.** Its rules are non-negotiable: no `transition: all`, no `ease-in` on UI elements, no `scale(0)` entrances, UI animations under 300ms with the strong custom curve tokens (`--ease-out/in-out/drawer` in globals.css), press feedback on pressables, hover motion gated behind `(hover: hover) and (pointer: fine)`, `prefers-reduced-motion` ships with every animation.
+2. **Building a new animation/interaction?** Follow `.agents/skills/animate/SKILL.md` (gate → purpose → tool → properties → curve/duration) and start from its `RECIPES.md` when one matches.
+3. **Touching gestures, sheets, translucency, or typography?** Consult `.agents/skills/apple-design/SKILL.md`.
+4. **Before finishing a UI task**, self-review against `.agents/skills/review-animations/SKILL.md` and present UI changes as a Before/After/Why markdown table.
+5. Extend the existing tokens in `globals.css`; never fork a parallel motion system.
