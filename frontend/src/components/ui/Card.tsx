@@ -32,7 +32,7 @@ export default function Card({
         <div
             className={`
         rounded-xl ${variantClasses[variant]}
-        ${hoverable ? 'transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5 hover:border-red-200 cursor-pointer' : ''}
+        ${hoverable ? 'card-hover cursor-pointer' : ''}
         ${paddingClasses[padding]}
         ${className}
       `}

@@ -63,8 +63,8 @@ export default function Home() {
       <section className="relative overflow-hidden bg-gradient-to-br from-red-50 via-white to-amber-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 text-xs font-semibold uppercase tracking-wider text-red-600 bg-red-100 rounded-full badge-shine">
+            <div className="max-w-xl hero-stagger">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 text-xs font-semibold uppercase tracking-wider text-red-600 bg-red-100 rounded-full">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -84,7 +84,7 @@ export default function Home() {
                 <Link
                   href="/products"
                   id="hero-shop-btn"
-                  className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all duration-200 active:scale-[0.98] shadow-lg shadow-red-600/25 cursor-pointer"
+                  className="pressable inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-[background-color,box-shadow] duration-200 shadow-lg shadow-red-600/25 cursor-pointer"
                 >
                   Shop All Snacks
                   <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -94,7 +94,7 @@ export default function Home() {
                 <Link
                   href="/categories"
                   id="hero-categories-btn"
-                  className="inline-flex items-center px-6 py-3 border-2 border-stone-200 text-stone-700 font-semibold rounded-xl hover:border-red-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 cursor-pointer"
+                  className="pressable inline-flex items-center px-6 py-3 border-2 border-stone-200 text-stone-700 font-semibold rounded-xl hover:border-red-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
                 >
                   Browse Categories
                 </Link>
@@ -172,12 +172,12 @@ export default function Home() {
                 key={cat.slug}
                 href={`/products?category=${cat.slug}`}
                 id={`cat-${cat.slug}`}
-                className={`flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-stone-200 hover:border-red-300 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer reveal reveal-delay-${i + 1}`}
+                className={`card-hover pressable group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-stone-200 cursor-pointer reveal reveal-delay-${i + 1}`}
               >
-                <div className="w-14 h-14 flex items-center justify-center bg-red-50 rounded-full group-hover:bg-red-100 group-hover:scale-110 transition-all duration-300">
+                <div className="w-14 h-14 flex items-center justify-center bg-red-50 rounded-full transition-colors duration-200 group-hover:bg-red-100">
                   <CategoryIcon type={cat.icon} />
                 </div>
-                <span className="text-sm font-semibold text-stone-700 group-hover:text-red-700 transition-colors">{cat.name}</span>
+                <span className="text-sm font-semibold text-stone-700 group-hover:text-red-700 transition-colors duration-200">{cat.name}</span>
               </Link>
             ))}
           </div>
@@ -196,7 +196,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             {steps.map((item, index) => (
               <div key={item.number} className={`relative text-center reveal reveal-delay-${index + 1}`}>
-                <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-red-50 to-amber-50 mb-6 relative z-10 group hover:scale-110 transition-transform duration-300 cursor-pointer">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-red-50 to-amber-50 mb-6 relative z-10">
                   <div className="text-red-600">{item.icon}</div>
                 </div>
                 <div className="text-xs font-bold uppercase tracking-widest text-red-600 mb-2">Step {item.number}</div>
@@ -257,7 +257,7 @@ export default function Home() {
 
 {/* CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 reveal">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-700 via-red-600 to-amber-600 px-8 md:px-16 py-14 text-center animate-gradient">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-700 via-red-600 to-amber-600 px-8 md:px-16 py-14 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 font-display">
             Ready to Taste the <span className="text-amber-200">Authentic Flavours</span>?
           </h2>
@@ -267,7 +267,7 @@ export default function Home() {
           <Link
             href="/products"
             id="cta-shop-btn"
-            className="inline-flex items-center px-8 py-4 bg-white text-red-600 font-semibold rounded-xl hover:bg-red-50 transition-all duration-200 active:scale-[0.98] shadow-xl cursor-pointer"
+            className="pressable inline-flex items-center px-8 py-4 bg-white text-red-600 font-semibold rounded-xl hover:bg-red-50 transition-colors duration-200 shadow-xl cursor-pointer"
           >
             Start Shopping
             <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

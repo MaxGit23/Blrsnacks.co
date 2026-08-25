@@ -103,7 +103,7 @@ function ProductsContent() {
                                 placeholder="Search snacks..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 border border-border-default rounded-[var(--radius-md)] text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 border border-border-default rounded-[var(--radius-md)] text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary transition-[border-color,box-shadow] duration-200"
                             />
                             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -216,12 +216,12 @@ function ProductCard({ product }: { product: Product }) {
     return (
         <Link href={`/products/${product.slug}`} id={`product-${product.slug}`}>
             <Card hoverable padding="none" className="overflow-hidden group">
-                <div className="relative h-48 bg-bg-secondary flex items-center justify-center overflow-hidden">
+                <div className="card-media-zoom relative h-48 bg-bg-secondary flex items-center justify-center overflow-hidden">
                     {product.images.length > 0 ? (
                         <img
                             src={getImageUrl(product.images[0])}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover"
                             loading="lazy"
                         />
                     ) : (

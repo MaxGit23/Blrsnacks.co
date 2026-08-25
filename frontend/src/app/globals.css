@@ -78,11 +78,13 @@
   --radius-2xl: 1.25rem;
   --radius-full: 9999px;
 
-  /* Transition */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Motion — strong custom curves (built-in easings are too weak) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --transition-fast: 150ms var(--ease-out);
+  --transition-base: 200ms var(--ease-out);
+  --transition-slow: 250ms var(--ease-out);
 
   /* Glass */
   --glass-bg: rgba(255, 255, 255, 0.75);
@@ -148,7 +150,7 @@ h4,
 h5,
 h6 {
   font-family: 'Playfair Display SC', Georgia, 'Times New Roman', serif;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 .font-body {
@@ -306,38 +308,13 @@ h6 {
     transform: translateY(-12px) rotate(2deg);
   }
 }
-
 @keyframes glow-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
   }
   50% {
     box-shadow: 0 0 40px rgba(220, 38, 38, 0.25);
-  }
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
   }
 }
 
@@ -350,33 +327,24 @@ h6 {
   }
 }
 
-@keyframes badge-shine {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 200%;
-  }
-}
-
 .animate-fade-in {
-  animation: fadeIn 0.4s ease-out;
+  animation: fadeIn 0.25s var(--ease-out);
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out;
+  animation: fadeInUp 0.3s var(--ease-out);
 }
 
 .animate-fade-in-down {
-  animation: fadeInDown 0.3s ease-out;
+  animation: fadeInDown 0.2s var(--ease-out);
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.3s ease-out;
+  animation: slideInRight 0.2s var(--ease-out);
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.2s ease-out;
+  animation: scaleIn 0.2s var(--ease-out);
 }
 
 .animate-shimmer {
@@ -401,51 +369,74 @@ h6 {
   animation: glow-pulse 3s ease-in-out infinite;
 }
 
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
-}
-
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
 
-/* ─── Scroll Reveal ────────────────────────────────────────────────────────── */
+/* ─── Scroll Reveal (marketing surfaces only) ──────────────────────────────── */
 
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out, filter 0.7s ease-out;
-  filter: blur(4px);
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s var(--ease-out),
+    transform 0.5s var(--ease-out);
 }
 
 .reveal.revealed {
   opacity: 1;
   transform: translateY(0);
-  filter: blur(0);
 }
 
-.reveal-delay-1 { transition-delay: 100ms; }
-.reveal-delay-2 { transition-delay: 200ms; }
-.reveal-delay-3 { transition-delay: 300ms; }
-.reveal-delay-4 { transition-delay: 400ms; }
-.reveal-delay-5 { transition-delay: 500ms; }
-.reveal-delay-6 { transition-delay: 600ms; }
+/* Stagger — short cascades, never blocking interaction */
+.reveal-delay-1 { transition-delay: 40ms; }
+.reveal-delay-2 { transition-delay: 80ms; }
+.reveal-delay-3 { transition-delay: 120ms; }
+.reveal-delay-4 { transition-delay: 160ms; }
+.reveal-delay-5 { transition-delay: 200ms; }
+.reveal-delay-6 { transition-delay: 240ms; }
 
-/* ─── Premium Card Styles ──────────────────────────────────────────────────── */
+/* ─── Cards & Press Feedback ───────────────────────────────────────────────── */
+
+button,
+.pressable {
+  transition-property: transform;
+  transition-duration: 160ms;
+  transition-timing-function: var(--ease-out);
+}
+
+button:active:not(:disabled),
+.pressable:active {
+  transform: scale(0.97);
+}
 
 .card-premium {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
 }
 
-.card-premium:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-4px);
-  border-color: var(--brand-warm);
+/* Gated hover lift + media zoom — touch devices fire false hovers on tap */
+@media (hover: hover) and (pointer: fine) {
+  .card-premium:hover,
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: #FECACA;
+  }
+
+  .card-hover .card-media-zoom img {
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .card-hover:hover .card-media-zoom img {
+    transform: scale(1.05);
+  }
 }
 
 /* ─── Gradient Text ────────────────────────────────────────────────────────── */
@@ -462,23 +453,6 @@ h6 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* ─── Badge Shine Effect ───────────────────────────────────────────────────── */
-
-.badge-shine {
-  position: relative;
-  overflow: hidden;
-}
-
-.badge-shine::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  animation: badge-shine 3s ease-in-out infinite;
 }
 
 /* ─── Section Divider ──────────────────────────────────────────────────────── */
@@ -500,6 +474,41 @@ h6 {
 a, button, [role="button"], input[type="submit"], .cursor-pointer {
   cursor: pointer;
 }
+
+/* ─── Header Mobile Menu (transitions, not keyframes — symmetric exit) ─────── */
+
+.menu-panel {
+  transform-origin: top center;
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity 0.2s var(--ease-out),
+    transform 0.2s var(--ease-out),
+    visibility 0s linear 0.2s;
+}
+
+.menu-panel[data-open='true'] {
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.2s var(--ease-out),
+    transform 0.2s var(--ease-out);
+}
+
+/* Hero entrance stagger — marketing surface only */
+.hero-stagger > * {
+  opacity: 0;
+  animation: fadeInUp 0.3s var(--ease-out) forwards;
+}
+
+.hero-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.hero-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.hero-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.hero-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.hero-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.hero-stagger > *:nth-child(6) { animation-delay: 200ms; }
 
 /* ─── Reduced Motion ───────────────────────────────────────────────────────── */
 

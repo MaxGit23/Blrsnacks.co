@@ -170,7 +170,7 @@ export default function ProductDetailPage() {
                                             aria-checked={isActive}
                                             onClick={() => setVariantIdx(i)}
                                             id={`weight-option-${v.label}`}
-                                            className={`relative px-4 py-3 rounded-xl border text-left transition-all duration-200 ${
+                                            className={`relative px-4 py-3 rounded-xl border text-left transition-[background-color,border-color,box-shadow,color] duration-150 ease-out active:scale-[0.97] ${
                                                 isActive
                                                     ? 'border-brand-primary bg-brand-primary-light ring-1 ring-brand-primary shadow-sm'
                                                     : 'border-border-default bg-white hover:border-border-dark hover:shadow-sm'

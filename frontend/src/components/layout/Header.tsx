@@ -26,7 +26,7 @@ export default function Header() {
     return (
         <div className="sticky top-0 z-50 flex flex-col w-full">
             {/* Announcement Bar */}
-            <div className="w-full bg-gradient-to-r from-red-700 via-red-600 to-amber-600 text-white text-xs sm:text-sm font-medium py-2 px-4 text-center badge-shine">
+            <div className="w-full bg-gradient-to-r from-red-700 via-red-600 to-amber-600 text-white text-xs sm:text-sm font-medium py-2 px-4 text-center">
                 <span className="hidden sm:inline">
                     <svg className="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1012 10.125 2.625 2.625 0 0012 4.875z" /></svg>
                     Free delivery on orders over ₹500!
@@ -34,12 +34,12 @@ export default function Header() {
                 {' '}Use code <code className="font-bold bg-white/20 px-2 py-0.5 rounded ml-1">BLRSNACKS</code>
             </div>
 
-            <header className={`transition-all duration-300 ${scrolled ? 'glass shadow-lg' : 'bg-white/95 border-b border-stone-200'}`}>
+            <header className={`[transition-property:background-color,border-color,box-shadow] duration-300 ease-out ${scrolled ? 'glass shadow-lg' : 'bg-white/95 border-b border-stone-200'}`}>
                 <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     {/* Logo */}
                     <div className="flex-shrink-0 flex items-center">
                         <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 to-amber-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 to-amber-500 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-200">
                                 <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
                                 </svg>
@@ -94,9 +94,12 @@ export default function Header() {
                 </nav>
 
                 {/* Mobile Menu */}
-                {mobileOpen && (
-                    <div id="mobile-menu" className="lg:hidden absolute top-full left-0 w-full glass shadow-xl border-b border-stone-200/50 animate-fade-in-down z-50">
-                        <div className="px-4 py-4 space-y-2">
+                <div
+                    id="mobile-menu"
+                    data-open={mobileOpen}
+                    className="lg:hidden absolute top-full left-0 w-full glass shadow-xl border-b border-stone-200/50 menu-panel z-50"
+                >
+                    <div className="px-4 py-4 space-y-2">
                             {isAuthenticated && (
                                 <div className="flex items-center justify-between py-2 border-b border-stone-200/50 mb-2">
                                     <span className="text-sm font-semibold text-stone-900">
@@ -129,8 +132,7 @@ export default function Header() {
                                 </div>
                             )}
                         </div>
-                    </div>
-                )}
+                </div>
             </header>
         </div>
     );
