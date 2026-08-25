@@ -18,6 +18,22 @@ export type DemoProduct = Product & { variants: ProductVariant[] };
 
 export const DEMO_PRODUCTS: DemoProduct[] = [
     {
+        id: 'demo-product-tomato-murukku',
+        name: 'Tomato Murukku',
+        slug: 'tomato-murukku',
+        description:
+            'Tangy tomato murukku — rice flour spirals infused with ripe tomato and a gentle chilli warmth. Crispy, bright, and hard to share.',
+        price: 38,
+        images: ['/tomato-murukku.jpeg'],
+        isPublished: true,
+        category: { id: 'demo-cat-murukku', name: 'Murukku', slug: 'murukku' },
+        createdAt: new Date('2026-08-25').toISOString(),
+        variants: [
+            { id: 'vt-200g', label: '200g', weightGrams: 200, price: 38 },
+            { id: 'vt-400g', label: '400g', weightGrams: 400, price: 70 },
+        ],
+    },
+    {
         id: 'demo-product-benne-murukku',
         name: 'Benne Butter Murukku',
         slug: 'benne-butter-murukku',
