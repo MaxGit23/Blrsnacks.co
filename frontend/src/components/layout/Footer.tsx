@@ -8,12 +8,6 @@ const footerLinks = {
     { href: '/categories/mixtures', label: 'Mixtures' },
     { href: '/categories/sweets', label: 'Sweets' },
   ],
-  account: [
-    { href: '/login', label: 'Login' },
-    { href: '/register', label: 'Sign Up' },
-    { href: '/orders', label: 'My Orders' },
-    { href: '/account', label: 'Account Settings' },
-  ],
   support: [
     { label: 'help@blrsnacks.co', href: 'mailto:help@blrsnacks.co' },
     { label: '+91 98765 43210', href: 'tel:+919876543210' },
@@ -30,7 +24,7 @@ export default function Footer() {
     return (
         <footer className="bg-stone-900 text-white mt-auto">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
                     {/* Brand */}
                     <div className="lg:col-span-2">
                         <Link href="/" className="flex items-center gap-2.5 text-xl font-bold mb-4 cursor-pointer">
@@ -78,20 +72,6 @@ export default function Footer() {
                         <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-white/80">Shop</h3>
                         <ul className="space-y-3">
                             {footerLinks.shop.map((link) => (
-                                <li key={link.href}>
-                                    <Link href={link.href} className="text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
-                                        {link.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Account */}
-                    <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-white/80">Account</h3>
-                        <ul className="space-y-3">
-                            {footerLinks.account.map((link) => (
                                 <li key={link.href}>
                                     <Link href={link.href} className="text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
                                         {link.label}

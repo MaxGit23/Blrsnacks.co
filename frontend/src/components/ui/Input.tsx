@@ -13,7 +13,8 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     ({ className = '', label, error, helperText, startIcon, endIcon, variant = 'default', id, ...props }, ref) => {
-        const inputId = id ?? useId();
+        const generatedId = useId();
+        const inputId = id ?? generatedId;
 
         return (
             <div className="w-full">

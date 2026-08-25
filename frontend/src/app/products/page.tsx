@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { productsApi, categoriesApi, type Product, type Category } from '@/lib/api';
-import { Card, Skeleton, Badge, Pagination, EmptyState } from '@/components/ui';
+import { DEMO_PRODUCTS, FALLBACK_CATEGORIES, type ProductVariant } from '@/lib/mock-products';
+import { Card, Skeleton, Pagination, EmptyState } from '@/components/ui';
 import { Container, PageHeader } from '@/components/layout';
 import { formatPrice } from '@/lib/format';
 import { getImageUrl } from '@/lib/images';
@@ -34,6 +35,8 @@ function ProductsContent() {
 
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
+        let list: Product[] = [];
+        let failed = false;
         try {
             const res = await productsApi.getAll({
                 search: debouncedSearch || undefined,
@@ -43,17 +46,33 @@ function ProductsContent() {
                 page,
                 limit: 12,
             });
-            setProducts(res.data);
-            setTotalPages(res.meta?.totalPages ?? 1);
+            list = res.data;
         } catch {
-            setProducts([]);
-        } finally {
-            setIsLoading(false);
+            failed = true;
         }
+
+        // Backend offline or nothing stored yet — fall back to demo catalogue
+        if (failed || list.length === 0) {
+            const q = debouncedSearch.trim().toLowerCase();
+            list = DEMO_PRODUCTS.filter((p) => {
+                const inCategory = !selectedCategory || p.category.slug === selectedCategory;
+                const matchesSearch =
+                    !q ||
+                    p.name.toLowerCase().includes(q) ||
+                    p.description.toLowerCase().includes(q);
+                return inCategory && matchesSearch;
+            });
+        }
+
+        setProducts(list);
+        setTotalPages(1);
+        setIsLoading(false);
     }, [debouncedSearch, selectedCategory, sortBy, sortOrder, page]);
 
     useEffect(() => {
-        categoriesApi.getAll().then(setCategories).catch(() => { /* noop */ });
+        categoriesApi.getAll()
+            .then(setCategories)
+            .catch(() => setCategories(FALLBACK_CATEGORIES));
     }, []);
 
     useEffect(() => {
@@ -188,16 +207,11 @@ function ProductsContent() {
 }
 
 function ProductCard({ product }: { product: Product }) {
-    const inStock = true;
-    const [isAdding, setIsAdding] = useState(false);
-
-    const handleAddToCart = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsAdding(true);
-        // Add to cart logic would go here
-        setTimeout(() => setIsAdding(false), 500);
-    };
+    const variants: ProductVariant[] | undefined =
+        (product as Product & { variants?: ProductVariant[] }).variants;
+    const [variantIdx, setVariantIdx] = useState(0);
+    const activeVariant = variants?.[variantIdx];
+    const displayPrice = activeVariant ? activeVariant.price : Number(product.price);
 
     return (
         <Link href={`/products/${product.slug}`} id={`product-${product.slug}`}>
@@ -217,28 +231,6 @@ function ProductCard({ product }: { product: Product }) {
                             className="w-24 h-24 opacity-50"
                         />
                     )}
-                    {!inStock && (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <Badge variant="error">Sold Out</Badge>
-                        </div>
-                    )}
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={!inStock || isAdding}
-                        className="absolute bottom-3 right-3 p-2 rounded-full bg-white shadow-md text-brand-primary hover:bg-brand-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label={`Add ${product.name} to cart`}
-                    >
-                        {isAdding ? (
-                            <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                        ) : (
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0-15l-6.75 6.75M12 4.5l6.75 6.75" />
-                            </svg>
-                        )}
-                    </button>
                 </div>
                 <div className="p-4">
                     <div className="text-xs text-text-tertiary uppercase tracking-wide mb-1">{product.category?.name}</div>
@@ -246,11 +238,28 @@ function ProductCard({ product }: { product: Product }) {
                         {product.name}
                     </h3>
                     <p className="mt-1 text-xs text-text-secondary line-clamp-2">{product.description}</p>
-                    <div className="mt-3 flex items-center justify-between">
-                        <span className="text-lg font-bold text-brand-primary">{formatPrice(Number(product.price))}</span>
-                        {inStock && (
-                            <span className="text-xs text-success font-medium">In Stock</span>
-                        )}
+
+                    {/* Weight selector */}
+                    {variants && variants.length > 0 && (
+                        <label className="mt-3 block">
+                            <span className="sr-only">Select weight for {product.name}</span>
+                            <select
+                                value={variantIdx}
+                                onChange={(e) => setVariantIdx(Number(e.target.value))}
+                                onClick={(e) => e.preventDefault()}
+                                className="w-full px-3 py-2 text-sm border border-border-default rounded-[var(--radius-md)] bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/30 appearance-none cursor-pointer"
+                            >
+                                {variants.map((v, i) => (
+                                    <option key={v.id} value={i}>
+                                        {v.label} — {formatPrice(v.price)}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    )}
+
+                    <div className="mt-3">
+                        <span className="text-lg font-bold text-brand-primary">{formatPrice(displayPrice)}</span>
                     </div>
                 </div>
             </Card>

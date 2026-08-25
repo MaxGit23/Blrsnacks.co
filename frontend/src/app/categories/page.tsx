@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { categoriesApi, type Category } from '@/lib/api';
+import { FALLBACK_CATEGORIES } from '@/lib/mock-products';
 import { Card, Skeleton, EmptyState } from '@/components/ui';
 import { Container, PageHeader } from '@/components/layout';
 
@@ -13,7 +14,8 @@ export default function CategoriesPage() {
     useEffect(() => {
         categoriesApi.getAll()
             .then(setCategories)
-            .catch(() => { /* noop */ })
+            // STATIC SITE MODE: fall back to the local category list
+            .catch(() => setCategories(FALLBACK_CATEGORIES))
             .finally(() => setIsLoading(false));
     }, []);
 

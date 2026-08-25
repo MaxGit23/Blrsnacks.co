@@ -1,32 +1,26 @@
-# Blrsnacks.co Project
+# AI Agent Instructions
 
-Full-stack grocery/snacks ecommerce platform.
+**CRITICAL: You are operating in an optimized AI coding environment. To preserve context limits and reduce token usage, you MUST follow these instructions precisely.**
 
-## Tech Stack
+# Startup Instructions
 
-- **Frontend**: Next.js 14+ with TypeScript, React, Tailwind CSS
-- **Backend**: NestJS with TypeScript
-- **Database**: PostgreSQL (via Prisma)
-- **Authentication**: JWT + Google OAuth
-- **Payment**: Cash on Delivery (COD)
+1. Read PROJECT_CONTEXT.md
+2. Read CURRENT_STATE.md
+3. Read TASKS.md
 
-## Project Structure
+Do not scan the repository unless explicitly instructed.
 
-```
-/                     - Root config files
-/frontend/            - Next.js frontend application
-/backend/             - NestJS backend API
-/docker-compose.yml   - Local dev environment (PostgreSQL)
-```
+Only inspect files relevant to the requested task.
 
-## Key Files
+## Initialization Protocol
+1. **Always read `PROJECT_CONTEXT.md` first.** This contains the architectural blueprint, database design, and core project rules.
+2. **Always read `CURRENT_STATE.md` second.** This tells you what has been done and what to avoid doing again.
+3. Review `TASKS.md` to understand your immediate objectives.
 
-- `:PROJECT_SCOPE.md` - Project requirements and goals
-- `skill.md` - Custom skill instructions
-
-## Code Standards
-
-- TypeScript strict mode
-- RESTful API design
-- Component-based React architecture
-- Environment-based configuration via `.env`
+## Operational Constraints
+* **Context Efficiency:** Read ONLY the files relevant to your specific task. 
+* **Do NOT scan the entire repository** (`list_dir`, global `grep`, etc.) unless explicitly requested by the user.
+* **Scope Discipline:** Do NOT refactor unrelated code. Do NOT analyze unrelated folders.
+* **Brevity:** Keep your responses concise. Do not explain standard framework concepts unless asked.
+* **Architectural Integrity:** Preserve the existing architecture. Follow the patterns outlined in `PROJECT_CONTEXT.md`.
+* **Completion Protocol:** When you finish a significant task, you MUST update `CURRENT_STATE.md` and `TASKS.md` to reflect your changes before ending the session.

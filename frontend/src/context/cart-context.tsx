@@ -1,5 +1,9 @@
 'use client';
 
+// STATIC SITE MODE — the cart is persisted in localStorage instead of a
+// backend. The public interface matches the original CartContextValue so UI
+// code is unaffected.
+
 import {
     createContext,
     useContext,
@@ -8,7 +12,8 @@ import {
     useCallback,
     type ReactNode,
 } from 'react';
-import { cartApi, type Cart, type CartItem } from '@/lib/api';
+import type { Cart, CartItem } from '@/lib/api';
+import { DEMO_PRODUCTS } from '@/lib/mock-products';
 
 interface CartState {
     cart: Cart | null;
@@ -28,11 +33,40 @@ interface CartContextValue extends CartState {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+const STORAGE_KEY = 'blrsnacks.demo-cart.v1';
+
 function calcTotal(items: CartItem[]): number {
     return items.reduce(
         (sum, item) => sum + item.product.price * item.quantity,
         0,
     );
+}
+
+function emptyCart(): Cart {
+    return {
+        id: 'demo-cart',
+        userId: null,
+        sessionId: null,
+        items: [],
+    };
+}
+
+function loadLocalCart(): Cart {
+    if (typeof window === 'undefined') return emptyCart();
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return emptyCart();
+        const parsed = JSON.parse(raw) as Cart;
+        if (!Array.isArray(parsed.items)) return emptyCart();
+        return parsed;
+    } catch {
+        return emptyCart();
+    }
+}
+
+function saveLocalCart(cart: Cart): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -44,17 +78,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
 
     const refreshCart = useCallback(async () => {
-        try {
-            const cart = await cartApi.get();
-            setState({
-                cart,
-                isLoading: false,
-                itemCount: cart.items.reduce((sum, i) => sum + i.quantity, 0),
-                total: calcTotal(cart.items),
-            });
-        } catch {
-            setState({ cart: null, isLoading: false, itemCount: 0, total: 0 });
-        }
+        const cart = loadLocalCart();
+        setState({
+            cart,
+            isLoading: false,
+            itemCount: cart.items.reduce((sum, i) => sum + i.quantity, 0),
+            total: calcTotal(cart.items),
+        });
     }, []);
 
     useEffect(() => {
@@ -63,7 +93,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const addItem = useCallback(
         async (productId: string, quantity = 1) => {
-            await cartApi.addItem(productId, quantity);
+            const cart = loadLocalCart();
+            const existing = cart.items.find((i) => i.productId === productId);
+
+            if (existing) {
+                existing.quantity += quantity;
+            } else {
+                const demo = DEMO_PRODUCTS.find((p) => p.id === productId);
+                const price = demo?.price ?? 0;
+                cart.items.push({
+                    id: `demo-item-${productId}`,
+                    productId,
+                    quantity,
+                    priceAtAdd: price,
+                    product: {
+                        id: productId,
+                        name: demo?.name ?? 'Product',
+                        slug: demo?.slug ?? '',
+                        price,
+                        images: demo?.images ?? [],
+                    },
+                });
+            }
+
+            saveLocalCart(cart);
             await refreshCart();
         },
         [refreshCart],
@@ -71,11 +124,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const updateItemQty = useCallback(
         async (itemId: string, quantity: number) => {
+            const cart = loadLocalCart();
             if (quantity <= 0) {
-                await cartApi.removeItem(itemId);
+                cart.items = cart.items.filter((i) => i.id !== itemId);
             } else {
-                await cartApi.updateItem(itemId, quantity);
+                const item = cart.items.find((i) => i.id === itemId);
+                if (item) item.quantity = quantity;
             }
+            saveLocalCart(cart);
             await refreshCart();
         },
         [refreshCart],
@@ -83,15 +139,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const removeItem = useCallback(
         async (itemId: string) => {
-            await cartApi.removeItem(itemId);
+            const cart = loadLocalCart();
+            cart.items = cart.items.filter((i) => i.id !== itemId);
+            saveLocalCart(cart);
             await refreshCart();
         },
         [refreshCart],
     );
 
     const clearCart = useCallback(async () => {
-        await cartApi.clear();
-        setState({ cart: null, isLoading: false, itemCount: 0, total: 0 });
+        saveLocalCart(emptyCart());
+        setState({ cart: emptyCart(), isLoading: false, itemCount: 0, total: 0 });
     }, []);
 
     const getItemByProductId = useCallback(

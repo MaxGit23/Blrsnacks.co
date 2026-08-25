@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import { generateSeoMetadata } from '@/lib/seo';
-import { Button } from '@/components/ui';
-import Image from 'next/image';
 import { ScrollRevealWrapper } from './ScrollRevealWrapper';
 import { AnimatedStats } from './AnimatedStats';
 
@@ -48,13 +46,6 @@ const steps = [
       <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
   )},
-];
-
-const stats = [
-  { value: '15K+', label: 'Happy Customers' },
-  { value: '50+', label: 'Handcrafted Snacks' },
-  { value: '98%', label: 'On-time Delivery' },
-  { value: '100%', label: 'Natural Ingredients' },
 ];
 
 const trustBadges = [

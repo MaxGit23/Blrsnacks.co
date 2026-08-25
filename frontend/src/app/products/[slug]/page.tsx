@@ -4,54 +4,47 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { productsApi, type Product } from '@/lib/api';
-import { Button, Badge, Skeleton } from '@/components/ui';
+import { findDemoProductBySlug, type DemoProduct, type ProductVariant } from '@/lib/mock-products';
+import { Skeleton } from '@/components/ui';
 import { Container } from '@/components/layout';
-import { useCart } from '@/context/cart-context';
-import { useToast } from '@/components/ui/Toast';
 import { formatPrice } from '@/lib/format';
 import { getImageUrl } from '@/lib/images';
 
 export default function ProductDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const { addToast } = useToast();
-    const { addItem } = useCart();
     const slug = params.slug as string;
 
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
-    const [addingToCart, setAddingToCart] = useState(false);
+    const [isDemo, setIsDemo] = useState(false);
+    const [variantIdx, setVariantIdx] = useState(0);
 
     useEffect(() => {
         const load = async () => {
+            setIsLoading(true);
+            setIsDemo(false);
+            setVariantIdx(0);
+            setSelectedImage(0);
             try {
                 const data = await productsApi.getBySlug(slug);
                 setProduct(data);
             } catch {
-                router.push('/products');
+                // Backend offline — fall back to the demo catalogue
+                const demo = findDemoProductBySlug(slug);
+                if (demo) {
+                    setProduct(demo);
+                    setIsDemo(true);
+                } else {
+                    router.push('/products');
+                }
             } finally {
                 setIsLoading(false);
             }
         };
         load();
     }, [slug, router]);
-
-    const availableStock = 999; // Override to ALWAYS show in stock
-
-    const handleAddToCart = async () => {
-        if (!product) return;
-        setAddingToCart(true);
-        try {
-            await addItem(product.id, quantity);
-            addToast(`${product.name} added to your cart!`, 'success');
-        } catch {
-            addToast('Could not add to cart — please try again', 'error');
-        } finally {
-            setAddingToCart(false);
-        }
-    };
 
     if (isLoading) {
         return (
@@ -71,6 +64,21 @@ export default function ProductDetailPage() {
     }
 
     if (!product) return null;
+
+    const variants: ProductVariant[] | undefined =
+        isDemo ? (product as DemoProduct).variants : undefined;
+    const activeVariant = variants?.[variantIdx];
+    const activePrice = activeVariant ? activeVariant.price : Number(product.price);
+    const pricePer100g = activeVariant
+        ? (activeVariant.price * 100) / activeVariant.weightGrams
+        : null;
+    const bestValueIdx = variants
+        ? variants.reduce(
+              (best, v, i) =>
+                  v.price / v.weightGrams < variants[best].price / variants[best].weightGrams ? i : best,
+              0,
+          )
+        : 0;
 
     return (
         <Container className="py-8 animate-fade-in">
@@ -127,56 +135,62 @@ export default function ProductDetailPage() {
                         </Link>
                     )}
                     <h1 className="text-3xl md:text-4xl font-bold text-brand-secondary mt-2">{product.name}</h1>
-
-                    <div className="flex items-center gap-3 mt-4">
-                        <span className="text-3xl font-bold text-brand-primary" id="product-price">
-                            {formatPrice(Number(product.price))}
+                    {isDemo && (
+                        <span className="inline-flex items-center gap-1 mt-3 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-amber-800 bg-amber-100 border border-amber-200 rounded-full">
+                            Demo product
                         </span>
-                        {availableStock > 0 ? (
-                            <Badge variant="success">In Stock</Badge>
-                        ) : (
-                            <Badge variant="error">Sold Out</Badge>
+                    )}
+
+                    <div className="flex items-baseline gap-3 mt-4">
+                        <span className="text-3xl font-bold text-brand-primary" id="product-price">
+                            {formatPrice(activePrice)}
+                        </span>
+                        {pricePer100g !== null && (
+                            <span className="text-sm text-text-tertiary" id="product-unit-price">
+                                {formatPrice(Number(pricePer100g.toFixed(2)))} / 100g
+                            </span>
                         )}
                     </div>
 
                     <p className="mt-6 text-text-secondary leading-relaxed">{product.description}</p>
 
-                    {/* Quantity + Add to Cart */}
-                    {availableStock > 0 && (
-                        <div className="mt-8 space-y-4">
-                            <div className="flex items-center gap-4">
-                                <label htmlFor="qty" className="text-sm font-medium text-text-primary">Quantity:</label>
-                                <div className="flex items-center border border-border-default rounded-[var(--radius-md)]">
-                                    <button
-                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors rounded-l-[var(--radius-md)]"
-                                        aria-label="Decrease quantity"
-                                    >
-                                        −
-                                    </button>
-                                    <span id="qty" className="px-4 py-2 text-sm font-semibold border-x border-border-default min-w-[48px] text-center">
-                                        {quantity}
-                                    </span>
-                                    <button
-                                        onClick={() => setQuantity(Math.min(availableStock, quantity + 1))}
-                                        className="px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors rounded-r-[var(--radius-md)]"
-                                        aria-label="Increase quantity"
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                                <span className="text-xs text-text-tertiary">{availableStock} available</span>
+                    {/* Weight selector */}
+                    {variants && variants.length > 0 && (
+                        <div className="mt-8">
+                            <div className="text-sm font-semibold text-text-primary mb-3">
+                                Weight <span className="font-normal text-text-tertiary">— pick a pack size</span>
                             </div>
-
-                            <Button
-                                id="add-to-cart-btn"
-                                size="lg"
-                                fullWidth
-                                isLoading={addingToCart}
-                                onClick={handleAddToCart}
-                            >
-                                Add to Cart — {formatPrice(Number(product.price) * quantity)}
-                            </Button>
+                            <div className="flex flex-wrap gap-x-4 gap-y-5 pt-2" role="radiogroup" aria-label="Select weight">
+                                {variants.map((v, i) => {
+                                    const isActive = i === variantIdx;
+                                    return (
+                                        <button
+                                            key={v.id}
+                                            role="radio"
+                                            aria-checked={isActive}
+                                            onClick={() => setVariantIdx(i)}
+                                            id={`weight-option-${v.label}`}
+                                            className={`relative px-4 py-3 rounded-xl border text-left transition-all duration-200 ${
+                                                isActive
+                                                    ? 'border-brand-primary bg-brand-primary-light ring-1 ring-brand-primary shadow-sm'
+                                                    : 'border-border-default bg-white hover:border-border-dark hover:shadow-sm'
+                                            }`}
+                                        >
+                                            {i === bestValueIdx && (
+                                                <span className="absolute -top-2 right-2 z-10 whitespace-nowrap px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white bg-success rounded-full shadow-sm ring-1 ring-white">
+                                                    Best value
+                                                </span>
+                                            )}
+                                            <div className={`text-sm font-semibold ${isActive ? 'text-brand-primary' : 'text-text-primary'}`}>
+                                                {v.label}
+                                            </div>
+                                            <div className={`text-xs mt-0.5 ${isActive ? 'text-brand-primary/80' : 'text-text-secondary'}`}>
+                                                {formatPrice(v.price)}
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
 
@@ -184,7 +198,7 @@ export default function ProductDetailPage() {
                     <div className="mt-10 border-t border-stone-200 pt-6 space-y-3">
                         {[
                             { iconPath: 'M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12', text: 'Free delivery on orders above ₹500' },
-                            { iconPath: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75-.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z', text: 'Cash on Delivery — no prepayment needed' },
+                            { iconPath: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5H21a.75.75 0 00-.75-.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z', text: 'Cash on Delivery — no prepayment needed' },
                             { iconPath: 'M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z', text: 'Same-day delivery across Bangalore' },
                             { iconPath: 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z', text: 'Freshly prepared, zero preservatives' },
                         ].map((info) => (

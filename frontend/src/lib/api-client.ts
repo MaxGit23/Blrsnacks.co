@@ -1,4 +1,8 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
+// ─────────────────────────────────────────────────────────────────────────────
+// STATIC SITE MODE — the REST layer is disabled.
+// Every API method rejects immediately without touching the network so that
+// pages can fall back to the local demo catalogue in `lib/mock-products.ts`.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface ApiResponse<T = unknown> {
     data: T;
@@ -16,101 +20,49 @@ export interface ApiError {
     error?: string;
 }
 
-class ApiClient {
-    private baseUrl: string;
-
-    constructor(baseUrl: string) {
-        this.baseUrl = baseUrl;
-    }
-
-    private async request<T>(
-        endpoint: string,
-        options: RequestInit = {},
-    ): Promise<T> {
-        const url = `${this.baseUrl}${endpoint}`;
-
-        let sessionId = typeof window !== 'undefined' ? localStorage.getItem('session_id') : null;
-        if (!sessionId && typeof window !== 'undefined') {
-            sessionId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
-            localStorage.setItem('session_id', sessionId);
-        }
-
-        const config: RequestInit = {
-            credentials: 'include', // Always send cookies
-            headers: {
-                'Content-Type': 'application/json',
-                ...(sessionId ? { 'x-session-id': sessionId } : {}),
-                ...options.headers,
-            },
-            ...options,
-        };
-
-        // Don't set Content-Type for FormData (browser sets multipart boundary)
-        if (options.body instanceof FormData) {
-            delete (config.headers as Record<string, string>)['Content-Type'];
-        }
-
-        const response = await fetch(url, config);
-
-        if (!response.ok) {
-            const error: ApiError = await response.json().catch(() => ({
-                statusCode: response.status,
-                message: response.statusText,
-            }));
-
-            throw error;
-        }
-
-        // Handle 204 No Content
-        if (response.status === 204) {
-            return {} as T;
-        }
-
-        return response.json();
-    }
-
-    async get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
-        let url = endpoint;
-        if (params) {
-            const searchParams = new URLSearchParams();
-            Object.entries(params).forEach(([key, value]) => {
-                if (value !== undefined) searchParams.append(key, String(value));
-            });
-            const qs = searchParams.toString();
-            if (qs) url += `?${qs}`;
-        }
-
-        return this.request<T>(url, { method: 'GET' });
-    }
-
-    async post<T>(endpoint: string, body?: unknown): Promise<T> {
-        return this.request<T>(endpoint, {
-            method: 'POST',
-            body: body instanceof FormData ? body : JSON.stringify(body),
-        });
-    }
-
-    async put<T>(endpoint: string, body?: unknown): Promise<T> {
-        return this.request<T>(endpoint, {
-            method: 'PUT',
-            body: JSON.stringify(body),
-        });
-    }
-
-    async patch<T>(endpoint: string, body?: unknown): Promise<T> {
-        return this.request<T>(endpoint, {
-            method: 'PATCH',
-            body: JSON.stringify(body),
-        });
-    }
-
-    async delete<T>(endpoint: string, body?: unknown): Promise<T> {
-        return this.request<T>(endpoint, {
-            method: 'DELETE',
-            ...(body ? { body: JSON.stringify(body) } : {}),
-        });
+/** Thrown by every API method while the site runs in static mode. */
+export class ApiClientDisabledError extends Error {
+    constructor() {
+        super('API disabled — this site is running in static mode without a backend.');
+        this.name = 'ApiClientDisabledError';
     }
 }
 
-export const api = new ApiClient(API_BASE);
+class ApiClient {
+    private async request<T>(): Promise<T> {
+        throw new ApiClientDisabledError();
+    }
+
+    async get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
+        void endpoint;
+        void params;
+        return this.request<T>();
+    }
+
+    async post<T>(endpoint: string, body?: unknown): Promise<T> {
+        void endpoint;
+        void body;
+        return this.request<T>();
+    }
+
+    async put<T>(endpoint: string, body?: unknown): Promise<T> {
+        void endpoint;
+        void body;
+        return this.request<T>();
+    }
+
+    async patch<T>(endpoint: string, body?: unknown): Promise<T> {
+        void endpoint;
+        void body;
+        return this.request<T>();
+    }
+
+    async delete<T>(endpoint: string, body?: unknown): Promise<T> {
+        void endpoint;
+        void body;
+        return this.request<T>();
+    }
+}
+
+export const api = new ApiClient();
 export default api;

@@ -1,7 +1,11 @@
 'use client';
 
+// STATIC SITE MODE — authentication is disabled. The provider keeps the same
+// interface (user state, login/register/logout) so UI code is unaffected, but
+// all methods are local-only and never touch a backend.
+
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { authApi, type User } from '@/lib/api';
+import type { User } from '@/lib/api';
 
 interface AuthState {
     user: User | null;
@@ -19,6 +23,8 @@ interface AuthContextValue extends AuthState {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const AUTH_DISABLED_MESSAGE = 'Authentication is disabled — this site runs in static mode without a backend.';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<AuthState>({
         user: null,
@@ -27,39 +33,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const refreshUser = useCallback(async () => {
-        try {
-            const user = await authApi.getProfile();
-            setState({ user, isLoading: false, isAuthenticated: true });
-        } catch {
-            setState({ user: null, isLoading: false, isAuthenticated: false });
-        }
+        setState({ user: null, isLoading: false, isAuthenticated: false });
     }, []);
 
     useEffect(() => {
         refreshUser();
     }, [refreshUser]);
 
-    const login = useCallback(async (email: string, password: string) => {
-        await authApi.login(email, password);
-        await refreshUser();
-    }, [refreshUser]);
+    const login = useCallback(async () => {
+        throw new Error(AUTH_DISABLED_MESSAGE);
+    }, []);
 
-    const register = useCallback(async (email: string, password: string) => {
-        await authApi.register(email, password);
-        await refreshUser();
-    }, [refreshUser]);
+    const register = useCallback(async () => {
+        throw new Error(AUTH_DISABLED_MESSAGE);
+    }, []);
 
-    const googleLogin = useCallback(async (idToken: string) => {
-        await authApi.googleAuth(idToken);
-        await refreshUser();
-    }, [refreshUser]);
+    const googleLogin = useCallback(async () => {
+        throw new Error(AUTH_DISABLED_MESSAGE);
+    }, []);
 
     const logout = useCallback(async () => {
-        try {
-            await authApi.logout();
-        } finally {
-            setState({ user: null, isLoading: false, isAuthenticated: false });
-        }
+        setState({ user: null, isLoading: false, isAuthenticated: false });
     }, []);
 
     return (
