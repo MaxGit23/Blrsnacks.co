@@ -9,7 +9,7 @@ export const metadata = generateSeoMetadata({
 });
 
 const categories = [
-  { image: '/banana-chips.jpg', name: 'Banana Chips', slug: 'banana-chips', icon: 'chips' },
+  { image: '/banana-chips.jpg', name: 'Chips', slug: 'chips', icon: 'chips' },
   { image: '/mixtures.jpg', name: 'Mixtures', slug: 'mixtures', icon: 'mixture' },
   { image: '/murukku.jpg', name: 'Murukku', slug: 'murukku', icon: 'murukku' },
   { image: '/sweets.jpg', name: 'Sweets', slug: 'sweets', icon: 'sweets' },

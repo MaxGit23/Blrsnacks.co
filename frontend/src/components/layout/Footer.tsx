@@ -4,7 +4,7 @@ const footerLinks = {
   shop: [
     { href: '/products', label: 'All Products' },
     { href: '/categories', label: 'Categories' },
-    { href: '/categories/chips', label: 'Banana Chips' },
+    { href: '/categories/chips', label: 'Chips' },
     { href: '/categories/mixtures', label: 'Mixtures' },
     { href: '/categories/sweets', label: 'Sweets' },
   ],

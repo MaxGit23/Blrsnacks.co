@@ -74,7 +74,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
         price: 25,
         images: ['/banana-chips-extra.jpg'],
         isPublished: true,
-        category: { id: 'demo-cat-chips', name: 'Banana Chips', slug: 'banana-chips' },
+        category: { id: 'demo-cat-crisps', name: 'Chips', slug: 'chips' },
         createdAt: new Date('2026-08-24').toISOString(),
         variants: [
             { id: 'vs-200g', label: '200g', weightGrams: 200, price: 25 },
@@ -730,7 +730,6 @@ export function findDemoProductBySlug(slug: string): DemoProduct | undefined {
 
 /** Sidebar category fallback while the backend is offline. */
 export const FALLBACK_CATEGORIES: Category[] = [
-    { id: 'cat-banana-chips', name: 'Banana Chips', slug: 'banana-chips', parentId: null },
     { id: 'cat-chips', name: 'Chips', slug: 'chips', parentId: null },
     { id: 'cat-mixtures', name: 'Mixtures', slug: 'mixtures', parentId: null },
     { id: 'cat-murukku', name: 'Murukku', slug: 'murukku', parentId: null },
