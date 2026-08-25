@@ -18,23 +18,6 @@ export type DemoProduct = Product & { variants: ProductVariant[] };
 
 export const DEMO_PRODUCTS: DemoProduct[] = [
     {
-        id: 'demo-product-banana-chips',
-        name: 'Classic Banana Chips',
-        slug: 'classic-banana-chips',
-        description:
-            'Thin, crispy nendran banana slices fried in pure coconut oil and finished with rock salt — an authentic Karnataka favourite, made fresh every morning.',
-        price: 20,
-        images: ['/banana-chips.jpg', '/banana-chips-extra.jpg'],
-        isPublished: true,
-        category: { id: 'demo-cat-chips', name: 'Banana Chips', slug: 'banana-chips' },
-        createdAt: new Date('2026-08-01').toISOString(),
-        variants: [
-            { id: 'v-200g', label: '200g', weightGrams: 200, price: 20 },
-            { id: 'v-400g', label: '400g', weightGrams: 400, price: 40 },
-            { id: 'v-500g', label: '500g', weightGrams: 500, price: 45 },
-        ],
-    },
-    {
         id: 'demo-product-benne-murukku',
         name: 'Benne Butter Murukku',
         slug: 'benne-butter-murukku',
