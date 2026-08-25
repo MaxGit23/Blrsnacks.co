@@ -33,10 +33,13 @@ export default function Footer() {
                             </div>
                             <span className="font-display tracking-wide">BLR Snacks</span>
                         </Link>
-                        <p className="text-stone-400 leading-relaxed mb-6 max-w-sm font-body">
+                        <p className="text-stone-400 leading-relaxed mb-2 max-w-sm font-body">
                             Authentic Bangalore snacks delivered fresh to your door. 
                             Quality flavours, traditional recipes, modern convenience.
                         </p>
+                        <small className="block text-stone-500 mb-6 font-body">
+                            Currently serving Kammanahalli &amp; nearby areas.
+                        </small>
                         <div className="flex gap-4">
                             {socialLinks.map((social) => (
                                 <a
