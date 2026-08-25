@@ -1,6 +1,7 @@
 # Tasks
 
 ## Completed (this session)
+*   [x] **Production deploy**: Site live at https://blrsnacks-co.vercel.app. Fixed Vercel 404s caused by Framework Preset "Other" — pinned `"framework": "nextjs"` in `frontend/vercel.json` and redeployed via CLI. Pending: set dashboard Root Directory=`frontend` for Git-based deploys.
 *   [x] **Codebase cleanup**: Deleted dead files (shadcn/demo/footer-column/get-started components, Supabase clients + storage lib, unused api modules, no-op middleware, todos page, unused public assets), stripped all commented-out STATIC SITE MODE blocks, removed unused exports/imports/states, uninstalled 7 unused packages. Fixed conditional-useId hook bug in Input.tsx. Verified with `tsc`, `next build` (all routes static) and route smoke tests.
 *   [x] **Full static mode**: Frontend runs with zero backend/cloud calls — REST layer disabled, cart persists to localStorage, auth local-only, demo catalogue fallback (`src/lib/mock-products.ts`).
 *   [x] **Weight variants UI**: "Classic Banana Chips" demo product with 200g/₹20, 400g/₹40, 500g/₹45; card dropdown + detail-page pill selector with per-100g price and "Best value" badge.

@@ -16,6 +16,7 @@
 *   Need to ensure Inventory reservation logic correctly ties in with the Order lifecycle.
 
 ## Recent Changes
+*   **PRODUCTION DEPLOYED**: Frontend live at https://blrsnacks-co.vercel.app (Vercel project `blrsnacks-co`, CLI-deployed from `frontend/`). Root cause of earlier 404s: Vercel Framework Preset was "Other" so no serverless functions were wired; fixed via `frontend/vercel.json` pinning `"framework": "nextjs"` (commit `28d3e88`). NOTE: dashboard project still shows Framework=Other + Root Directory=`.` — set Root Directory to `frontend` in the dashboard for future Git-based deploys.
 *   **CODEBASE CLEANUP (production pass)**:
     *   Deleted dead files: `components/ui/{shadcn-button,get-started-button,demo,footer-column}.tsx`, `lib/utils.ts`, `lib/supabase-storage.ts`, `lib/api/{users,inventory}.ts`, `src/middleware.ts` (no-op), `src/utils/` (Supabase clients), `src/app/todos/` (Supabase demo page), unused public SVGs (next/vercel/globe/window/file), stale `.vercel/output`.
     *   Stripped all `STATIC SITE MODE` commented-out blocks from api-client, auth/cart contexts, Header, product pages — implementations are now clean.
