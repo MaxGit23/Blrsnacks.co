@@ -76,7 +76,7 @@ export default function Footer() {
                         <ul className="space-y-3">
                             {footerLinks.shop.map((link) => (
                                 <li key={link.href}>
-                                    <Link href={link.href} className="text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
+                                    <Link href={link.href} className="inline-block py-1 text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -90,7 +90,7 @@ export default function Footer() {
                         <ul className="space-y-3">
                             {footerLinks.support.map((item) => (
                                 <li key={item.label}>
-                                    <a href={item.href} className="text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
+                                    <a href={item.href} className="inline-block py-1 text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
                                         {item.label}
                                     </a>
                                 </li>
@@ -105,11 +105,8 @@ export default function Footer() {
                             © {new Date().getFullYear()} BLR Snacks. All rights reserved.
                         </p>
                         <div className="flex items-center gap-6">
-                            <Link href="/privacy" className="text-sm text-stone-500 hover:text-red-400 transition-colors cursor-pointer">
+                            <Link href="/privacy" className="inline-block py-1 text-sm text-stone-500 hover:text-red-400 transition-colors cursor-pointer">
                                 Privacy Policy
-                            </Link>
-                            <Link href="/terms" className="text-sm text-stone-500 hover:text-red-400 transition-colors cursor-pointer">
-                                Terms of Service
                             </Link>
                         </div>
                     </div>

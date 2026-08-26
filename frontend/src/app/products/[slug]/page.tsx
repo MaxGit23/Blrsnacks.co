@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { productsApi, type Product } from '@/lib/api';
-import { findDemoProductBySlug, type DemoProduct, type ProductVariant } from '@/lib/mock-products';
+import { DEMO_PRODUCTS, findDemoProductBySlug, type DemoProduct, type ProductVariant } from '@/lib/mock-products';
 import { Skeleton } from '@/components/ui';
 import { Container } from '@/components/layout';
+import { ProductCard } from '@/components/products/ProductCard';
 import { formatPrice } from '@/lib/format';
 import { getImageUrl } from '@/lib/images';
 
@@ -79,6 +80,9 @@ export default function ProductDetailPage() {
               0,
           )
         : 0;
+    const relatedProducts = product.category
+        ? DEMO_PRODUCTS.filter((p) => p.category.slug === product.category!.slug && p.id !== product.id).slice(0, 3)
+        : [];
 
     return (
         <Container className="py-8 animate-fade-in">
@@ -194,8 +198,8 @@ export default function ProductDetailPage() {
                         </div>
                     )}
 
-                    {/* Delivery info */}
-                    <div className="mt-10 border-t border-stone-200 pt-6 space-y-3">
+                    {/* Delivery info — one bounded region */}
+                    <div className="mt-10 rounded-[var(--radius-lg)] border border-border-light bg-bg-secondary/60 p-5 space-y-3">
                         {[
                             { iconPath: 'M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12', text: 'Free delivery on orders above ₹500' },
                             { iconPath: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5H21a.75.75 0 00-.75-.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z', text: 'Cash on Delivery — no prepayment needed' },
@@ -210,6 +214,28 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Related products — same category, keeps the journey going */}
+            {product.category && relatedProducts.length > 0 && (
+                <section className="mt-16 pt-10 border-t border-stone-200" aria-label="Related products">
+                    <div className="flex items-baseline justify-between mb-6">
+                        <h2 className="text-xl md:text-2xl font-bold text-stone-900 font-display">
+                            More from {product.category.name}
+                        </h2>
+                        <Link
+                            href={`/products?category=${product.category.slug}`}
+                            className="text-sm font-medium text-brand-primary hover:text-brand-primary-hover transition-colors shrink-0 ml-4"
+                        >
+                            View all →
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {relatedProducts.map((p) => (
+                            <ProductCard key={p.id} product={p} />
+                        ))}
+                    </div>
+                </section>
+            )}
         </Container>
     );
 }

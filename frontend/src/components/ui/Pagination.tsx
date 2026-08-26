@@ -76,7 +76,7 @@ export default function Pagination({
                         size="sm"
                         onClick={() => onPageChange(page)}
                         aria-current={page === currentPage ? 'page' : undefined}
-                        className="min-w-[36px]"
+                        className="min-w-[40px]"
                     >
                         {page}
                     </Button>

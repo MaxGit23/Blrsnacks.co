@@ -12,8 +12,8 @@ const navLinks = [
   { href: '/products', label: 'Shop All' },
   { href: '/categories/chips', label: 'Chips' },
   { href: '/categories/mixtures', label: 'Mixtures' },
-  { href: '/categories/sweets', label: 'Sweets' },
   { href: '/categories/murukku', label: 'Murukku' },
+  { href: '/categories/sweets', label: 'Sweets' },
 ];
 
 export default function Header() {
@@ -26,16 +26,15 @@ export default function Header() {
     const [activeIdx, setActiveIdx] = useState(-1);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
-    // Live product matches for the search popover
+    // Live product matches — tolerant of word order and extra words (Postel's Law)
     const results = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return [];
-        return DEMO_PRODUCTS.filter(
-            (p) =>
-                p.name.toLowerCase().includes(q) ||
-                p.description.toLowerCase().includes(q) ||
-                p.category.name.toLowerCase().includes(q),
-        ).slice(0, 5);
+        const words = q.split(/\s+/);
+        return DEMO_PRODUCTS.filter((p) => {
+            const haystack = `${p.name} ${p.description} ${p.category.name}`.toLowerCase();
+            return words.every((w) => haystack.includes(w));
+        }).slice(0, 5);
     }, [query]);
 
     useEffect(() => {
@@ -84,13 +83,9 @@ export default function Header() {
 
     return (
         <div className="sticky top-0 z-50 flex flex-col w-full">
-            {/* Announcement Bar */}
+            {/* Announcement Bar — one message, all breakpoints */}
             <div className="w-full bg-gradient-to-r from-red-700 via-red-600 to-amber-600 text-white text-xs sm:text-sm font-medium py-2 px-4 text-center">
-                <span className="hidden sm:inline">
-                    <svg className="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1012 10.125 2.625 2.625 0 0012 4.875z" /></svg>
-                    Free delivery on orders over ₹500!
-                </span>
-                {' '}Use code <code className="font-bold bg-white/20 px-2 py-0.5 rounded ml-1">BLRSNACKS</code>
+                Free delivery on orders over ₹500 · Cash on Delivery
             </div>
 
             <header className={`[transition-property:background-color,border-color,box-shadow] duration-300 ease-out ${scrolled ? 'glass shadow-lg' : 'bg-white/95 border-b border-stone-200'}`}>
