@@ -7,7 +7,7 @@ import { productsApi, type Product } from '@/lib/api';
 import { DEMO_PRODUCTS, findDemoProductBySlug, type DemoProduct, type ProductVariant } from '@/lib/mock-products';
 import { Skeleton } from '@/components/ui';
 import { Container } from '@/components/layout';
-import { ProductCard } from '@/components/products/ProductCard';
+import { ProductCarousel } from '@/components/products/ProductCarousel';
 import { formatPrice } from '@/lib/format';
 import { getImageUrl } from '@/lib/images';
 
@@ -215,7 +215,7 @@ export default function ProductDetailPage() {
                 </div>
             </div>
 
-            {/* Related products — same category, keeps the journey going */}
+            {/* Related products — same category, paged with left/right CTAs */}
             {product.category && relatedProducts.length > 0 && (
                 <section className="mt-16 pt-10 border-t border-stone-200" aria-label="Related products">
                     <div className="flex items-baseline justify-between mb-6">
@@ -229,11 +229,7 @@ export default function ProductDetailPage() {
                             View all →
                         </Link>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {relatedProducts.map((p) => (
-                            <ProductCard key={p.id} product={p} />
-                        ))}
-                    </div>
+                    <ProductCarousel products={relatedProducts} label={`More ${product.category.name.toLowerCase()}`} />
                 </section>
             )}
         </Container>
