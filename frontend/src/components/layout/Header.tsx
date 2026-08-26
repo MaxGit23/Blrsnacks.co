@@ -77,6 +77,7 @@ export default function Header() {
     }, []);
 
     const openSearch = useCallback(() => {
+        setMobileOpen(false);
         setActiveIdx(-1);
         setSearchOpen((o) => !o);
     }, []);
@@ -119,10 +120,10 @@ export default function Header() {
 
                     {/* Right Actions */}
                     <div className="relative flex items-center gap-1.5">
-                        {/* Search */}
+                        {/* Search — available on all screen sizes */}
                         <button
                             id="header-search-trigger"
-                            className={`hidden sm:flex p-2.5 rounded-full transition-colors duration-200 cursor-pointer ${searchOpen ? 'text-red-600 bg-red-50' : 'text-stone-500 hover:text-red-600 hover:bg-red-50'}`}
+                            className={`flex p-2.5 rounded-full transition-colors duration-200 cursor-pointer ${searchOpen ? 'text-red-600 bg-red-50' : 'text-stone-500 hover:text-red-600 hover:bg-red-50'}`}
                             aria-label="Search"
                             aria-expanded={searchOpen}
                             aria-controls="header-search"
@@ -242,8 +243,11 @@ export default function Header() {
 
                         {/* Mobile Menu Toggle */}
                         <button
-                            className="lg:hidden p-2 rounded-lg text-stone-500 hover:bg-stone-100 transition-all duration-200 cursor-pointer"
-                            onClick={() => setMobileOpen(!mobileOpen)}
+                            className="lg:hidden p-2 rounded-lg text-stone-500 hover:bg-stone-100 transition-colors duration-200 cursor-pointer"
+                            onClick={() => {
+                                setSearchOpen(false);
+                                setMobileOpen(!mobileOpen);
+                            }}
                             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
                             aria-expanded={mobileOpen}
                         >
