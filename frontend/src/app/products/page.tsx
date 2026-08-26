@@ -25,8 +25,6 @@ function ProductsContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState(searchParams.get('search') ?? '');
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') ?? '');
-    const [sortBy, setSortBy] = useState<string>('createdAt');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -45,8 +43,6 @@ function ProductsContent() {
             const res = await productsApi.getAll({
                 search: debouncedSearch || undefined,
                 categorySlug: selectedCategory || undefined,
-                sortBy: sortBy as 'price' | 'name' | 'createdAt',
-                sortOrder,
                 page,
                 limit: 12,
             });
@@ -71,7 +67,7 @@ function ProductsContent() {
         setProducts(list);
         setTotalPages(1);
         setIsLoading(false);
-    }, [debouncedSearch, selectedCategory, sortBy, sortOrder, page]);
+    }, [debouncedSearch, selectedCategory, page]);
 
     useEffect(() => {
         categoriesApi.getAll()
@@ -86,7 +82,7 @@ function ProductsContent() {
     // Reset page when filters change
     useEffect(() => {
         setPage(1);
-    }, [debouncedSearch, selectedCategory, sortBy, sortOrder]);
+    }, [debouncedSearch, selectedCategory]);
 
     return (
         <Container className="py-8 animate-fade-in">
@@ -139,27 +135,6 @@ function ProductsContent() {
                                     </button>
                                 ))}
                             </div>
-                        </div>
-
-                        {/* Sort */}
-                        <div>
-                            <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">Sort By</h3>
-                            <select
-                                id="product-sort"
-                                value={`${sortBy}-${sortOrder}`}
-                                onChange={(e) => {
-                                    const [by, order] = e.target.value.split('-');
-                                    setSortBy(by);
-                                    setSortOrder(order as 'asc' | 'desc');
-                                }}
-                                className="w-full px-3 py-2 border border-border-default rounded-[var(--radius-md)] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-primary/30 appearance-none"
-                            >
-                                <option value="createdAt-desc">Newest First</option>
-                                <option value="createdAt-asc">Oldest First</option>
-                                <option value="price-asc">Price: Low → High</option>
-                                <option value="price-desc">Price: High → Low</option>
-                                <option value="name-asc">Name: A → Z</option>
-                            </select>
                         </div>
                     </div>
                 </aside>
