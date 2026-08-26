@@ -734,6 +734,4 @@ export const FALLBACK_CATEGORIES: Category[] = [
     { id: 'cat-mixtures', name: 'Mixtures', slug: 'mixtures', parentId: null },
     { id: 'cat-murukku', name: 'Murukku', slug: 'murukku', parentId: null },
     { id: 'cat-sweets', name: 'Sweets', slug: 'sweets', parentId: null },
-    { id: 'cat-dry-fruits', name: 'Dry Fruits', slug: 'dry-fruits', parentId: null },
-    { id: 'cat-beverages', name: 'Beverages', slug: 'beverages', parentId: null },
 ];

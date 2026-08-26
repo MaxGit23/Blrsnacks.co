@@ -13,8 +13,6 @@ const categories = [
   { image: '/mixtures.jpg', name: 'Mixtures', slug: 'mixtures', icon: 'mixture' },
   { image: '/murukku.jpg', name: 'Murukku', slug: 'murukku', icon: 'murukku' },
   { image: '/sweets.jpg', name: 'Sweets', slug: 'sweets', icon: 'sweets' },
-  { image: '/dry-fruits.jpg', name: 'Dry Fruits', slug: 'dry-fruits', icon: 'nuts' },
-  { image: '/beverages.jpg', name: 'Beverages', slug: 'beverages', icon: 'beverage' },
 ];
 
 function CategoryIcon({ type }: { type: string }) {
@@ -166,7 +164,7 @@ export default function Home() {
               All categories →
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {categories.map((cat, i) => (
               <Link
                 key={cat.slug}
