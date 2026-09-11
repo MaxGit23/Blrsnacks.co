@@ -139,11 +139,6 @@ export default function ProductDetailPage() {
                         </Link>
                     )}
                     <h1 className="text-3xl md:text-4xl font-bold text-brand-secondary mt-2">{product.name}</h1>
-                    {isDemo && (
-                        <span className="inline-flex items-center gap-1 mt-3 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-amber-800 bg-amber-100 border border-amber-200 rounded-full">
-                            Demo product
-                        </span>
-                    )}
 
                     {/* Price display — commented out per request
                     <div className="flex items-baseline gap-3 mt-4">
