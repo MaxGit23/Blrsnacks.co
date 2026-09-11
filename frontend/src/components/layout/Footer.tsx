@@ -9,8 +9,8 @@ const footerLinks = {
     { href: '/categories/sweets', label: 'Sweets' },
   ],
   support: [
-    { label: 'help@blrsnacks.co', href: 'mailto:help@blrsnacks.co' },
-    { label: '+91 98765 43210', href: 'tel:+919876543210' },
+    { label: 'shivagst2307@gmail.com', href: 'mailto:shivagst2307@gmail.com' },
+    // { label: '+91 98765 43210', href: 'tel:+919876543210' },
   ],
 };
 

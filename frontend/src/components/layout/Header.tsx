@@ -210,9 +210,6 @@ export default function Header() {
                                                         {p.category.name}
                                                     </span>
                                                 </span>
-                                                <span className="text-sm font-bold text-brand-primary shrink-0">
-                                                    {formatPrice(p.price)}
-                                                </span>
                                             </Link>
                                         ))}
 

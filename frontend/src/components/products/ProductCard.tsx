@@ -12,8 +12,7 @@ export function ProductCard({ product }: { product: Product }) {
     const variants: ProductVariant[] | undefined =
         (product as DemoProduct).variants;
     const [variantIdx, setVariantIdx] = useState(0);
-    const activeVariant = variants?.[variantIdx];
-    const displayPrice = activeVariant ? activeVariant.price : Number(product.price);
+
 
     return (
         <Link href={`/products/${product.slug}`} id={`product-${product.slug}`}>
@@ -42,7 +41,7 @@ export function ProductCard({ product }: { product: Product }) {
                     <p className="mt-1 text-xs text-text-secondary line-clamp-2">{product.description}</p>
 
                     {/* Weight selector */}
-                    {variants && variants.length > 0 && (
+                    {/* {variants && variants.length > 0 && (
                         <label className="mt-3 block">
                             <span className="sr-only">Select weight for {product.name}</span>
                             <select
@@ -58,11 +57,8 @@ export function ProductCard({ product }: { product: Product }) {
                                 ))}
                             </select>
                         </label>
-                    )}
+                    )} */}
 
-                    <div className="mt-3">
-                        <span className="text-lg font-bold text-brand-primary">{formatPrice(displayPrice)}</span>
-                    </div>
                 </div>
             </Card>
         </Link>

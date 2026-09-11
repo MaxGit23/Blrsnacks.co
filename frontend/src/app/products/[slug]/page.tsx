@@ -145,6 +145,7 @@ export default function ProductDetailPage() {
                         </span>
                     )}
 
+                    {/* Price display — commented out per request
                     <div className="flex items-baseline gap-3 mt-4">
                         <span className="text-3xl font-bold text-brand-primary" id="product-price">
                             {formatPrice(activePrice)}
@@ -155,10 +156,11 @@ export default function ProductDetailPage() {
                             </span>
                         )}
                     </div>
+                    */}
 
                     <p className="mt-6 text-text-secondary leading-relaxed">{product.description}</p>
 
-                    {/* Weight selector */}
+                    {/* Weight selector — commented out per request
                     {variants && variants.length > 0 && (
                         <div className="mt-8">
                             <div className="text-sm font-semibold text-text-primary mb-3">
@@ -197,6 +199,7 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
                     )}
+                    */}
 
                     {/* Delivery info — one bounded region */}
                     <div className="mt-10 rounded-[var(--radius-lg)] border border-border-light bg-bg-secondary/60 p-5 space-y-3">
