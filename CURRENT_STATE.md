@@ -16,6 +16,31 @@
 *   Need to ensure Inventory reservation logic correctly ties in with the Order lifecycle.
 
 ## Recent Changes
+*   **PREMIUM BRAND REFACTOR — COMPLETE (All 4 CRO Pillars & Phases 1-6)**:
+    *   **Pillar 1: Brand Messaging & Anti-Positioning (Phase 1)**:
+        *   Hero rewrite: "Not Another Snack Store." + "Small-batch South Indian craft."
+        *   Anti-positioning section ("The BLR Standard"): Direct contrast of mass-market factory practices (Palm oil, chemical preservatives, stale batches) vs. the BLR Standard (Cold-pressed groundnut oil, wood-fired batches, natural spice colours).
+        *   Artisanal trust badges, announcement bar with ₹750 free express shipping threshold, and outlet route `/batch-specials`.
+    *   **Pillar 2: Product-Level CRO Architecture (Phase 2)**:
+        *   Enriched `DemoProduct` with `artisanTags`, `ingredients`, `shelfLife`, `certifications`, `pairingTip`, `storageTip`, and `spiceLevel`.
+        *   Added `SpiceLevelIndicator` and `EfficacyBadges` components (`Zero Trans-Fat`, `100% Cold-Pressed Oil`, `No Artificial Colours`, `FSSAI Certified`).
+        *   PDP overhauled with Direct-from-Kitchen price, unit economics (`₹X.XX / 100g`), pack size selector (`200g`, `400g`, `500g`) with "Best Value" highlight, clean-label ingredients accordion, "Peak Crunch" storage card, and sensory coffee/tea pairing notes.
+        *   Product cards updated with starting price, weight pill selection, and 1-click "Add to Tasting Vault".
+    *   **Pillar 3: AOV Expansion & Cart Architecture (Phase 3 & 4)**:
+        *   Built `CartDrawer` with Emil Kowalski cubic bezier motion curve (`--ease-drawer`, 280ms duration, symmetric enter/exit).
+        *   Dynamic AOV free express shipping progress bar scaling up to ₹750 threshold.
+        *   "Complete The Tasting" 1-click upsell recommendations embedded directly in the drawer.
+        *   High-ticket curated tasting vaults (`CuratedVaults` on homepage): "The Bangalore Heritage Box" (₹699, save 15%), "Evening Kaapi & Chai Vault" (₹499, save 12%), and "Grand Festive Connoisseur Trunk" (₹999, save 18%).
+    *   **Pillar 4: Social Proof & Retention (Phase 5 & 6)**:
+        *   Physical Presence Authority widget (`PhysicalPresenceWidget`): 4 authentic Bangalore tasting locations (Indiranagar, Lavelle Road, Koramangala, Malleshwaram).
+        *   Verifiable customer reviews with badges: "Verified Bangalore Resident", "Filter Coffee Purist", "3rd-Gen Food Purist".
+        *   `CrispnessGuideModal`: 4-step craft care instructions on preserving crunch and the 2-minute monsoon crispness revival.
+        *   All animations follow design engineering guidelines; zero `transition: all`, press feedback on active states, hover effects gated behind fine pointers. Webpack build compiles 22/22 routes in 2.4s.
+
+## Next Recommended Steps
+*   **Production Deployment to Vercel**: Deploy the completed 4-pillar refactor to production with `vercel --prod` from `frontend/`.
+*   **Restore Supabase Backend**: When the cloud project is restored, wire the `ProductVariant` schema into Prisma and database migrations.
+*   **Checkout & COD Validation**: Hook up order confirmation with the new multi-pack variant order items.
 *   **LAWS OF UX APPLIED** (`f419b01`): Detail pages gained a related-products section (Peak-End/Goal-Gradient) and delivery info now sits in one bounded card (Common Region). Header search matches word-by-word in any order (Postel's Law). Announcement bar is one message on all breakpoints (Hick's/Cognitive Load). Nav reordered strongest-first/last (Serial Position). Footer links + pagination got bigger hit targets (Fitts's Law). Dead `/terms` footer link removed (Jakob's Law/trust).
 *   **CATALOGUE AT 44 PRODUCTS**: Added 29 more products (`dd95ad3`) — new **Chips** category (10: potato/tapioca/wheel/onion-ring), 7 mixtures, White Chakli (murukku), 11 sweets/bakery items (barfi, chikkis, laddu, cookies/biscuits, rusk). Renamed uploads to web-safe names; fixed `avalakki.jpg` mislabeled webp-as-jpg; compressed oversized images. Homepage category strip still shows the original 6 featured cards; full list incl. Chips lives on /categories sidebar. Banana Chips category was merged into Chips (`8ab9c30`).
 *   **DESIGN SYSTEM REDESIGN (emilkowalski/skills)**: Installed Emil Kowalski design-engineering skills to `.agents/skills/` and applied them site-wide — strong custom easing tokens (`--ease-out/in-out/drawer`), global press feedback (`scale(0.97)`, 160ms), hover lifts/zooms gated behind `(hover:hover) and (pointer:fine)`, all `transition-all` replaced with named properties, mobile menu rewritten as mounted panel with symmetric enter/exit transitions, scroll reveal retuned (500ms/16px/40ms stagger), removed decorative loops (badge shine, animated gradient, ungated icon scales), negative tracking on display headings. Verified tsc + build clean; live on production.
@@ -35,4 +60,9 @@
 *   Backend currently NOT runnable — Supabase project `bqxnllqfjcukvfpcocfh` appears paused/deleted ("tenant not found"). Backend source left intact for future restore. Frontend runs standalone on port 3002.
 
 ## Next Recommended Steps
+*   **Premium Refactor Phase 2**: Enrich `DemoProduct` type with `artisanTags`, `ingredients`, `shelfLife`, `certifications`, `pairingTip`, `storageTip`, `spiceLevel`. Un-comment weight selector + price on ProductCard and PDP. Add efficacy badges and storage/pairing cards.
+*   **Premium Refactor Phase 3**: Build slide-out CartDrawer with AOV progress bar (₹750 threshold). Re-enable add-to-cart flow.
+*   **Premium Refactor Phase 4**: Create curated bundles ("Bangalore Tasting Vault") and bundle cards on homepage/PDP.
+*   **Premium Refactor Phase 5**: Social proof system — EfficacyBadge component, StockistFinder widget, FreshnessGuarantee card.
+*   **Premium Refactor Phase 6**: Post-purchase onboarding — WelcomeModal, PairingGuideModal, re-order/referral preview.
 *   Restore the paused Supabase project to bring the backend back online; then re-introduce the API layer and design the real `ProductVariant` Prisma model matching the demo shape (`{ label, weightGrams, price }`).

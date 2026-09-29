@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 const SITE_NAME = 'BLR Snacks';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://blrsnacks.co';
-const DEFAULT_DESCRIPTION = 'Authentic Bangalore snacks delivered fresh to your door. Explore chips, mixtures, sweets, and more from BLR Snacks.';
+const DEFAULT_DESCRIPTION = 'Cold-pressed, wood-fired, hand-shaped. Artisanal South Indian snacks crafted fresh daily in Bangalore. Zero preservatives, zero compromise.';
 
 interface SeoOptions {
     title: string;
@@ -72,8 +72,8 @@ export function generateCategorySeo(category: {
     slug: string;
 }): Metadata {
     return generateSeoMetadata({
-        title: `${category.name} — Browse Snacks`,
-        description: `Shop the best ${category.name.toLowerCase()} from Bangalore. Fresh, authentic flavours delivered to your door.`,
+        title: `${category.name} — Small-Batch Craft Snacks`,
+        description: `Explore artisanal ${category.name.toLowerCase()} from Bangalore — cold-pressed, hand-shaped, zero preservatives. Crafted fresh daily.`,
         path: `/categories/${category.slug}`,
     });
 }

@@ -2,17 +2,20 @@ import Link from 'next/link';
 import { generateSeoMetadata } from '@/lib/seo';
 import { ScrollRevealWrapper } from './ScrollRevealWrapper';
 import { AnimatedStats } from './AnimatedStats';
+import { CuratedVaults } from '@/components/bundles/CuratedVaults';
+import { PhysicalPresenceWidget } from '@/components/home/PhysicalPresenceWidget';
 
 export const metadata = generateSeoMetadata({
-  title: 'Authentic Bangalore Snacks — Delivered Fresh Daily',
+  title: 'Small-Batch South Indian Craft Snacks',
+  description: 'Cold-pressed, wood-fired, hand-shaped. Artisanal South Indian snacks crafted fresh daily in Bangalore. Zero preservatives, zero compromise.',
   path: '/',
 });
 
 const categories = [
-  { image: '/banana-chips.jpg', name: 'Chips', slug: 'chips', icon: 'chips' },
-  { image: '/mixtures.jpg', name: 'Mixtures', slug: 'mixtures', icon: 'mixture' },
-  { image: '/murukku.jpg', name: 'Murukku', slug: 'murukku', icon: 'murukku' },
-  { image: '/sweets.jpg', name: 'Sweets', slug: 'sweets', icon: 'sweets' },
+  { image: '/banana-chips.jpg', name: 'Chips', slug: 'chips', icon: 'chips', tagline: 'Kettle-crisp, cold-pressed' },
+  { image: '/mixtures.jpg', name: 'Mixtures', slug: 'mixtures', icon: 'mixture', tagline: 'Hand-blended, small-batch' },
+  { image: '/murukku.jpg', name: 'Murukku', slug: 'murukku', icon: 'murukku', tagline: 'Hand-pressed, single-origin' },
+  { image: '/sweets.jpg', name: 'Sweets', slug: 'sweets', icon: 'sweets', tagline: 'Jaggery-set, wood-fired' },
 ];
 
 function CategoryIcon({ type }: { type: string }) {
@@ -22,24 +25,22 @@ function CategoryIcon({ type }: { type: string }) {
     case 'mixture': return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.047 8.287 8.287 0 009 9.601a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.468 5.99 5.99 0 00-1.925 3.547 5.975 5.975 0 01-2.133-1.001A3.75 3.75 0 0012 18z" /></svg>;
     case 'murukku': return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>;
     case 'sweets': return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1012 10.125 2.625 2.625 0 0012 4.875z" /></svg>;
-    case 'nuts': return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
     default: return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>;
   }
 }
 
 const steps = [
-  { number: '01', title: 'Choose Your Snacks', description: 'Browse our collection of handcrafted snacks and pick your favourites.', icon: (
+  { number: '01', title: 'Explore the Collection', description: 'Browse 44+ handcrafted varieties — chips, mixtures, murukku, and sweets made fresh every morning.', icon: (
     <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
   )},
-  { number: '02', title: 'We Deliver Fresh', description: 'Same-day delivery across Bangalore with your preferred time slot.', icon: (
+  { number: '02', title: 'We Deliver Same Day', description: 'Your snacks leave our kitchen and reach your door within hours — never a warehouse, always fresh.', icon: (
     <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v2H8v-2a1 1 0 011-1h4a1 1 0 011 1v2h-1v-2h-1v2h-1v-2h-1V10a1 1 0 011-1h-1" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
     </svg>
   )},
-  { number: '03', title: 'Pay on Delivery', description: 'No online payment needed. Pay cash when your snacks arrive.', icon: (
+  { number: '03', title: 'Pay When It Arrives', description: 'No online payments. Inspect your order, then pay cash. Our quality speaks before your wallet opens.', icon: (
     <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
@@ -47,17 +48,33 @@ const steps = [
 ];
 
 const trustBadges = [
-  { label: 'Zero Preservatives', iconPath: 'M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z' },
-  { label: 'Fresh Daily Batches', iconPath: 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z' },
-  { label: 'Same-day Delivery', iconPath: 'M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12' },
-  { label: 'Cash on Delivery', iconPath: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75-.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z' },
+  { label: 'Cold-Pressed Groundnut Oil', iconPath: 'M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z' },
+  { label: 'Wood-Fired Batches', iconPath: 'M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.047 8.287 8.287 0 009 9.601a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z' },
+  { label: 'Zero Preservatives', iconPath: 'M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { label: 'Hand-Shaped Daily', iconPath: 'M10.05 4.575a1.575 1.575 0 10-3.15 0v3.038c0 1.043-.645 1.962-1.61 2.347A4.462 4.462 0 003 14.2v.638c0 1.035.34 2.047.982 2.87a5.617 5.617 0 003.843 2.196 5.252 5.252 0 004.35 0 5.617 5.617 0 003.843-2.197A4.986 4.986 0 0017 14.838v-.638a4.462 4.462 0 00-2.29-4.24c-.965-.385-1.61-1.304-1.61-2.347V4.575a1.575 1.575 0 00-3.15 0' },
 ];
+
+/* Anti-positioning: what we reject vs what we stand for */
+const antiStandards = {
+  rejected: [
+    { label: 'Palm Oil', desc: 'Cheap, flavourless, ubiquitous in mass snacks' },
+    { label: 'Artificial Colours', desc: 'Synthetic dyes to fake freshness' },
+    { label: 'Chemical Preservatives', desc: 'Added shelf life, subtracted taste' },
+    { label: 'Stale Month-Old Batches', desc: 'Warehouse-aged, factory-sealed' },
+  ],
+  embraced: [
+    { label: 'Cold-Pressed Groundnut Oil', desc: 'Single-source, stone-ground, full flavour' },
+    { label: 'Natural Spice Colour', desc: 'Turmeric, chilli, and curry leaves do the work' },
+    { label: 'Zero Additives', desc: 'Nothing your grandmother wouldn\'t recognise' },
+    { label: 'Prepared Fresh Every Morning', desc: 'Kitchen to your door, same day' },
+  ],
+};
 
 export default function Home() {
   return (
     <ScrollRevealWrapper>
     <div className="animate-fade-in">
-      {/* Hero Section */}
+      {/* ═══ Hero Section ═══ */}
       <section className="relative overflow-hidden bg-gradient-to-br from-red-50 via-white to-amber-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -67,16 +84,17 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                 </span>
-                Fresh batches every morning
+                Small-batch · Crafted this morning
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-[1.1] tracking-tight font-display">
-                Real Bangalore Flavours,
+                Not Another
                 <br />
-                <span className="text-gradient-warm">Delivered Fresh</span>
+                <span className="text-gradient-warm">Snack Store.</span>
               </h1>
               <p className="mt-6 text-lg text-stone-600 leading-relaxed max-w-lg font-body">
-                Discover crispy banana chips, fiery mixtures, crunchy murukku, and traditional sweets — 
-                small-batch crafted from time-honoured South Indian recipes.
+                Cold-pressed oils. Wood-fired batches. Hand-shaped traditions.
+                We make South Indian snacks the way they were meant to be made —
+                and we refuse to cut a single corner.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
@@ -84,17 +102,17 @@ export default function Home() {
                   id="hero-shop-btn"
                   className="pressable inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-[background-color,box-shadow] duration-200 shadow-lg shadow-red-600/25 cursor-pointer"
                 >
-                  Shop All Snacks
+                  Explore the Collection
                   <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
                 </Link>
                 <Link
-                  href="/categories"
-                  id="hero-categories-btn"
+                  href="#our-standards"
+                  id="hero-standards-btn"
                   className="pressable inline-flex items-center px-6 py-3 border-2 border-stone-200 text-stone-700 font-semibold rounded-xl hover:border-red-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
                 >
-                  Browse Categories
+                  Our Standards
                 </Link>
               </div>
               
@@ -117,7 +135,7 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-t from-red-600/40 to-transparent z-10" />
                   <img
                     src="/hero-product.jpg"
-                    alt="Authentic Bangalore Snacks"
+                    alt="Artisanal South Indian snacks — cold-pressed, hand-shaped, crafted fresh daily"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute bottom-6 left-6 right-6 z-20">
@@ -131,8 +149,8 @@ export default function Home() {
                           ))}
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-stone-900">50+ Varieties</div>
-                          <div className="text-xs text-stone-500">of authentic snacks</div>
+                          <div className="text-sm font-semibold text-stone-900">44+ Craft Varieties</div>
+                          <div className="text-xs text-stone-500">zero preservatives, zero shortcuts</div>
                         </div>
                       </div>
                     </div>
@@ -155,11 +173,11 @@ export default function Home() {
         <div className="absolute bottom-0 -left-20 w-60 h-60 bg-amber-100/30 rounded-full blur-3xl pointer-events-none" />
       </section>
 
-{/* Categories Strip */}
+      {/* ═══ Categories Strip ═══ */}
       <section className="border-y border-stone-200 bg-stone-50 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold text-stone-900 font-display">Shop by Category</h2>
+            <h2 className="text-xl font-bold text-stone-900 font-display">Shop by Craft</h2>
             <Link href="/categories" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors cursor-pointer">
               All categories →
             </Link>
@@ -176,19 +194,81 @@ export default function Home() {
                   <CategoryIcon type={cat.icon} />
                 </div>
                 <span className="text-sm font-semibold text-stone-700 group-hover:text-red-700 transition-colors duration-200">{cat.name}</span>
+                <span className="text-[11px] text-stone-400 font-body -mt-1">{cat.tagline}</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 lg:py-28 bg-white reveal">
+      {/* ═══ Anti-Positioning: "The BLR Standard" ═══ */}
+      <section id="our-standards" className="py-20 lg:py-28 bg-stone-900 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-stone-900 font-display">How It Works</h2>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 text-xs font-semibold uppercase tracking-wider text-amber-400 bg-amber-400/10 rounded-full">
+              Our Anti-Standard
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white font-display">
+              What We <span className="text-red-400">Reject</span> vs What We <span className="text-amber-400">Stand For</span>
+            </h2>
+            <p className="mt-4 text-stone-400 max-w-lg mx-auto text-lg font-body">
+              Every choice we make starts with a refusal. Here&rsquo;s what separates
+              BLR Snacks from the packets lining supermarket shelves.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
+            {/* Rejected column */}
+            <div className="rounded-2xl border border-red-500/20 bg-red-950/30 p-6 lg:p-8">
+              <div className="flex items-center gap-2 mb-6">
+                <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-red-400">Mass-Market Standard</h3>
+              </div>
+              <div className="space-y-5">
+                {antiStandards.rejected.map((item) => (
+                  <div key={item.label} className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-red-500/60 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    <div>
+                      <div className="font-semibold text-white/80 font-body">{item.label}</div>
+                      <div className="text-sm text-stone-500 font-body">{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Embraced column */}
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-950/20 p-6 lg:p-8">
+              <div className="flex items-center gap-2 mb-6">
+                <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-amber-400">The BLR Standard</h3>
+              </div>
+              <div className="space-y-5">
+                {antiStandards.embraced.map((item) => (
+                  <div key={item.label} className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-amber-500/80 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    <div>
+                      <div className="font-semibold text-white font-body">{item.label}</div>
+                      <div className="text-sm text-stone-400 font-body">{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ Curated Tasting Vaults (Bundles) ═══ */}
+      <CuratedVaults />
+
+      {/* ═══ How It Works ═══ */}
+      <section id="how-it-works" className="py-20 lg:py-28 bg-white reveal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold text-stone-900 font-display">Kitchen to Doorstep</h2>
             <p className="mt-3 text-stone-600 max-w-md mx-auto text-lg font-body">
-              Three simple steps to get authentic Bangalore snacks delivered fresh
+              No warehouses. No middlemen. Three steps from our kitchen to your table.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
@@ -206,19 +286,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why BLR Snacks */}
+      {/* ═══ Why BLR Snacks ═══ */}
       <section className="py-20 lg:py-28 bg-stone-900 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight font-display">
                 Why Bangalore <br/>
-                <span className="text-amber-400">Loves BLR Snacks</span>
+                <span className="text-amber-400">Trusts BLR Snacks</span>
               </h2>
               <p className="mt-6 text-stone-400 leading-relaxed text-lg font-body">
-                We’re more than a snack store. Every batch is prepared fresh using 
-                recipes handed down through generations of South Indian kitchens — 
-                with zero artificial additives.
+                We don&rsquo;t sell snacks — we preserve a craft. Every murukku is hand-pressed.
+                Every chip is fried in cold-pressed groundnut oil. Every batch is made
+                fresh that morning. No factory lines, no shortcuts, no compromise.
               </p>
               <AnimatedStats />
             </div>
@@ -228,10 +308,10 @@ export default function Home() {
                 <div className="relative bg-stone-800 rounded-3xl p-8 border border-stone-700">
                   <div className="space-y-6">
                     {[
-                      { title: 'Fresh Daily', desc: 'Batches prepared every morning' },
-                      { title: 'Natural', desc: 'Zero preservatives or additives' },
-                      { title: 'Traditional', desc: 'Authentic family recipes' },
-                      { title: 'Fast Delivery', desc: 'Same-day across Bangalore' },
+                      { title: 'Cold-Pressed', desc: '100% groundnut oil, stone-ground' },
+                      { title: 'Hand-Shaped', desc: 'Every murukku pressed by hand, daily' },
+                      { title: 'Wood-Fired', desc: 'Traditional batch process, never factory' },
+                      { title: 'Same-Day Fresh', desc: 'Kitchen to your door within hours' },
                     ].map((item) => (
                       <div key={item.title} className="flex items-center gap-4">
                         <div className="w-10 h-10 flex items-center justify-center bg-red-500/20 rounded-xl">
@@ -253,21 +333,51 @@ export default function Home() {
         </div>
       </section>
 
-{/* CTA Banner */}
+      {/* ═══ Physical Presence & Reviews ═══ */}
+      <PhysicalPresenceWidget />
+
+      {/* ═══ Freshness Guarantee Banner ═══ */}
+      <section className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-900 py-12 reveal">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+            <div className="w-16 h-16 shrink-0 flex items-center justify-center bg-emerald-700/50 rounded-2xl border border-emerald-600/30">
+              <svg className="w-8 h-8 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <div className="text-center md:text-left flex-1">
+              <h3 className="text-xl font-bold text-white font-display mb-1">30-Day Crispness Guarantee</h3>
+              <p className="text-emerald-200/80 font-body">
+                Lost its crunch? Crushed in transit? We replace it — no questions, no fine print.
+                Just WhatsApp us a photo.
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="pressable shrink-0 px-6 py-3 bg-white text-emerald-800 font-semibold rounded-xl hover:bg-emerald-50 transition-colors duration-200 shadow-lg cursor-pointer"
+            >
+              Shop with Confidence
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ CTA Banner ═══ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 reveal">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-700 via-red-600 to-amber-600 px-8 md:px-16 py-14 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 font-display">
-            Ready to Taste the <span className="text-amber-200">Authentic Flavours</span>?
+            Ready to Taste the <span className="text-amber-200">Difference</span>?
           </h2>
           <p className="text-white/80 mb-8 max-w-md mx-auto text-lg font-body">
-            Order now and get your favourites delivered fresh today. Cash on delivery — no hassle.
+            No preservatives. No palm oil. No shortcuts. Just the snacks
+            Bangalore grew up on — made exactly like they should be.
           </p>
           <Link
             href="/products"
             id="cta-shop-btn"
             className="pressable inline-flex items-center px-8 py-4 bg-white text-red-600 font-semibold rounded-xl hover:bg-red-50 transition-colors duration-200 shadow-xl cursor-pointer"
           >
-            Start Shopping
+            Explore the Collection
             <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>

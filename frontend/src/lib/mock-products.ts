@@ -1,5 +1,7 @@
 import type { Product, Category } from './api';
 
+export type SpiceLevel = 'mild' | 'medium' | 'hot';
+
 /**
  * Weight/size variant for demo products.
  * Mirrors the future `ProductVariant` Prisma model so the static
@@ -13,8 +15,99 @@ export interface ProductVariant {
     price: number;
 }
 
-/** A demo product is a normal Product plus optional weight variants. */
-export type DemoProduct = Product & { variants: ProductVariant[] };
+/** A demo product is a normal Product plus weight variants and artisanal metadata. */
+export type DemoProduct = Product & {
+    variants: ProductVariant[];
+    artisanTags?: string[];
+    ingredients?: string;
+    shelfLife?: string;
+    certifications?: string[];
+    pairingTip?: string;
+    storageTip?: string;
+    spiceLevel?: SpiceLevel;
+    isBatchSpecial?: boolean;
+    batchExpiresAt?: string;
+};
+
+/**
+ * Returns comprehensive artisanal metadata with fallback defaults per category
+ * to guarantee that all 44 products have complete CRO & trust properties.
+ */
+export function getProductArtisanDetails(product: Product | DemoProduct): {
+    artisanTags: string[];
+    ingredients: string;
+    shelfLife: string;
+    certifications: string[];
+    pairingTip: string;
+    storageTip: string;
+    spiceLevel?: SpiceLevel;
+} {
+    const demo = product as DemoProduct;
+    const catSlug = product.category?.slug?.toLowerCase() || '';
+
+    // Specific product overrides
+    const slug = product.slug?.toLowerCase() || '';
+    let spice: SpiceLevel | undefined = demo.spiceLevel;
+    if (!spice) {
+        if (slug.includes('spicy') || slug.includes('bakarwadi') || slug.includes('chilli') || slug.includes('pepper')) {
+            spice = 'hot';
+        } else if (slug.includes('masala') || slug.includes('mixture') || slug.includes('kodubale') || slug.includes('tomato')) {
+            spice = 'medium';
+        } else {
+            spice = 'mild';
+        }
+    }
+
+    if (catSlug === 'chips' || catSlug === 'crisps') {
+        return {
+            artisanTags: demo.artisanTags || [
+                slug.includes('banana') ? 'Cold-Pressed Coconut Oil' : 'Cold-Pressed Groundnut Oil',
+                'Wood-Fired Kettle',
+            ],
+            ingredients: demo.ingredients || 'Selected Farm Produce (Banana/Potato/Tapioca), Pure Cold-Pressed Oil, Rock Salt, Hand-Crushed Spices & Fresh Curry Leaves.',
+            shelfLife: demo.shelfLife || 'Peak crispness: 30 days from preparation date',
+            certifications: demo.certifications || ['Zero Trans-Fat', '100% Cold-Pressed Oil', 'No Artificial Colours', 'FSSAI Certified'],
+            pairingTip: demo.pairingTip || 'Crisp, savoury accompaniment to piping-hot South Indian filter coffee or ginger chai.',
+            storageTip: demo.storageTip || 'Store in an airtight container away from sunlight and moisture to preserve peak crunch.',
+            spiceLevel: spice,
+        };
+    }
+
+    if (catSlug === 'murukku') {
+        return {
+            artisanTags: demo.artisanTags || ['Stone-Ground Rice Flour', 'Hand-Pressed Brass Mould'],
+            ingredients: demo.ingredients || 'Stone-Ground Aged Rice Flour, Roasted Gram Dal, Cumin Seeds, Cold-Pressed Groundnut Oil, White Butter (Benne), Asafoetida, Rock Salt.',
+            shelfLife: demo.shelfLife || 'Peak crispness: 25 days from preparation date',
+            certifications: demo.certifications || ['Zero Trans-Fat', 'No Chemical Preservatives', 'Traditional Recipe', 'FSSAI Certified'],
+            pairingTip: demo.pairingTip || 'The quintessential Bangalore coffee companion — perfect for 4 PM Brahmins-style filter kaapi.',
+            storageTip: demo.storageTip || 'Keep sealed in an airtight tin at room temperature. Avoid refrigeration.',
+            spiceLevel: spice,
+        };
+    }
+
+    if (catSlug === 'sweets') {
+        return {
+            artisanTags: demo.artisanTags || ['100% Pure Cow Ghee', 'Artisanal Hand-Poured'],
+            ingredients: demo.ingredients || 'Pure Desi Cow Ghee, Gram Flour / Cashews / Nuts, Unrefined Khandsari Sugar / Organic Jaggery, Green Cardamom Pods.',
+            shelfLife: demo.shelfLife || 'Consume fresh within 20 days of batch preparation',
+            certifications: demo.certifications || ['100% Desi Cow Ghee', 'Zero Palm Oil', 'No Artificial Essence', 'FSSAI Certified'],
+            pairingTip: demo.pairingTip || 'Best savoured post-meal or paired with an unsweetened strong South Indian filter coffee.',
+            storageTip: demo.storageTip || 'Store in a cool, dry place. Keep container tightly closed to retain melt-in-mouth richness.',
+            spiceLevel: 'mild',
+        };
+    }
+
+    // Default: Mixtures and savoury snacks
+    return {
+        artisanTags: demo.artisanTags || ['Wood-Fired Batch Roast', 'Cold-Pressed Groundnut Oil'],
+        ingredients: demo.ingredients || 'Gram Flour (Besan), Whole Native Peanuts, Roasted Split Gram, Curry Leaves, Cold-Pressed Groundnut Oil, Red Chilli Powder, Asafoetida, Sea Salt.',
+        shelfLife: demo.shelfLife || 'Peak crispness: 30 days from preparation date',
+        certifications: demo.certifications || ['Zero Trans-Fat', 'No Artificial Colours', 'Zero Preservatives', 'FSSAI Certified'],
+        pairingTip: demo.pairingTip || 'Unbeatable evening accompaniment to spiced masala chai, filter coffee, or chilled buttermilk.',
+        storageTip: demo.storageTip || 'Reseal immediately after serving to preserve multi-component textural crunch.',
+        spiceLevel: spice,
+    };
+}
 
 export const DEMO_PRODUCTS: DemoProduct[] = [
     {

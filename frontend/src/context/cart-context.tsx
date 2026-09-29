@@ -13,22 +13,26 @@ import {
     type ReactNode,
 } from 'react';
 import type { Cart, CartItem } from '@/lib/api';
-import { DEMO_PRODUCTS } from '@/lib/mock-products';
+import { DEMO_PRODUCTS, type ProductVariant } from '@/lib/mock-products';
 
 interface CartState {
     cart: Cart | null;
     isLoading: boolean;
     itemCount: number;
     total: number;
+    isCartOpen: boolean;
 }
 
 interface CartContextValue extends CartState {
     refreshCart: () => Promise<void>;
-    addItem: (productId: string, quantity?: number) => Promise<void>;
+    addItem: (productId: string, quantity?: number, variant?: ProductVariant) => Promise<void>;
     updateItemQty: (itemId: string, quantity: number) => Promise<void>;
     removeItem: (itemId: string) => Promise<void>;
     clearCart: () => Promise<void>;
     getItemByProductId: (productId: string) => CartItem | undefined;
+    openCart: () => void;
+    closeCart: () => void;
+    toggleCart: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -37,7 +41,7 @@ const STORAGE_KEY = 'blrsnacks.demo-cart.v1';
 
 function calcTotal(items: CartItem[]): number {
     return items.reduce(
-        (sum, item) => sum + item.product.price * item.quantity,
+        (sum, item) => sum + (item.priceAtAdd || item.product.price) * item.quantity,
         0,
     );
 }
@@ -75,35 +79,55 @@ export function CartProvider({ children }: { children: ReactNode }) {
         isLoading: true,
         itemCount: 0,
         total: 0,
+        isCartOpen: false,
     });
 
     const refreshCart = useCallback(async () => {
         const cart = loadLocalCart();
-        setState({
+        setState((prev) => ({
+            ...prev,
             cart,
             isLoading: false,
             itemCount: cart.items.reduce((sum, i) => sum + i.quantity, 0),
             total: calcTotal(cart.items),
-        });
+        }));
     }, []);
 
     useEffect(() => {
         refreshCart();
     }, [refreshCart]);
 
+    const openCart = useCallback(() => {
+        setState((prev) => ({ ...prev, isCartOpen: true }));
+    }, []);
+
+    const closeCart = useCallback(() => {
+        setState((prev) => ({ ...prev, isCartOpen: false }));
+    }, []);
+
+    const toggleCart = useCallback(() => {
+        setState((prev) => ({ ...prev, isCartOpen: !prev.isCartOpen }));
+    }, []);
+
     const addItem = useCallback(
-        async (productId: string, quantity = 1) => {
+        async (productId: string, quantity = 1, variant?: ProductVariant) => {
             const cart = loadLocalCart();
-            const existing = cart.items.find((i) => i.productId === productId);
+            const itemId = variant
+                ? `demo-item-${productId}-${variant.id}`
+                : `demo-item-${productId}`;
+
+            const existing = cart.items.find((i) => i.id === itemId);
 
             if (existing) {
                 existing.quantity += quantity;
             } else {
                 const demo = DEMO_PRODUCTS.find((p) => p.id === productId);
-                const price = demo?.price ?? 0;
+                const price = variant ? variant.price : (demo?.price ?? 0);
                 cart.items.push({
-                    id: `demo-item-${productId}`,
+                    id: itemId,
                     productId,
+                    variantId: variant?.id,
+                    variantLabel: variant?.label,
                     quantity,
                     priceAtAdd: price,
                     product: {
@@ -118,8 +142,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
             saveLocalCart(cart);
             await refreshCart();
+            openCart();
         },
-        [refreshCart],
+        [refreshCart, openCart],
     );
 
     const updateItemQty = useCallback(
@@ -149,7 +174,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const clearCart = useCallback(async () => {
         saveLocalCart(emptyCart());
-        setState({ cart: emptyCart(), isLoading: false, itemCount: 0, total: 0 });
+        setState((prev) => ({
+            ...prev,
+            cart: emptyCart(),
+            isLoading: false,
+            itemCount: 0,
+            total: 0,
+        }));
     }, []);
 
     const getItemByProductId = useCallback(
@@ -168,6 +199,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 removeItem,
                 clearCart,
                 getItemByProductId,
+                openCart,
+                closeCart,
+                toggleCart,
             }}
         >
             {children}

@@ -16,3 +16,4 @@ node_modules/
 .claude/
 .vercel/
 backend/vercel-logs.txt
+.vercel

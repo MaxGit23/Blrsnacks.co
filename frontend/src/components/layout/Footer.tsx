@@ -2,11 +2,16 @@ import Link from 'next/link';
 
 const footerLinks = {
   shop: [
-    { href: '/products', label: 'All Products' },
+    { href: '/products', label: 'The Collection' },
     { href: '/categories', label: 'Categories' },
+    { href: '/batch-specials', label: 'Batch Specials' },
     { href: '/categories/chips', label: 'Chips' },
     { href: '/categories/mixtures', label: 'Mixtures' },
     { href: '/categories/sweets', label: 'Sweets' },
+  ],
+  about: [
+    { href: '/#our-standards', label: 'Our Standards' },
+    { href: '/#how-it-works', label: 'How It Works' },
   ],
   support: [
     { label: 'shivagst2307@gmail.com', href: 'mailto:shivagst2307@gmail.com' },
@@ -34,11 +39,11 @@ export default function Footer() {
                             <span className="font-display tracking-wide">BLR Snacks</span>
                         </Link>
                         <p className="text-stone-400 leading-relaxed mb-2 max-w-sm font-body">
-                            Authentic Bangalore snacks delivered fresh to your door. 
-                            Quality flavours, traditional recipes, modern convenience.
+                            Small-batch South Indian craft. Cold-pressed oils, wood-fired batches, 
+                            hand-shaped traditions. Zero shortcuts.
                         </p>
                         <small className="block text-stone-500 mb-6 font-body">
-                            Currently serving Kammanahalli &amp; nearby areas.
+                            Crafted in Bangalore · Serving Kammanahalli &amp; nearby areas.
                         </small>
                         <div className="flex gap-4">
                             {socialLinks.map((social) => (
@@ -75,6 +80,20 @@ export default function Footer() {
                         <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-white/80">Shop</h3>
                         <ul className="space-y-3">
                             {footerLinks.shop.map((link) => (
+                                <li key={link.href}>
+                                    <Link href={link.href} className="inline-block py-1 text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* About */}
+                    <div>
+                        <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-white/80">About</h3>
+                        <ul className="space-y-3">
+                            {footerLinks.about.map((link) => (
                                 <li key={link.href}>
                                     <Link href={link.href} className="inline-block py-1 text-sm text-stone-400 hover:text-red-400 transition-colors cursor-pointer">
                                         {link.label}

@@ -4,20 +4,23 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
+import { useCart } from '@/context/cart-context';
 import { DEMO_PRODUCTS } from '@/lib/mock-products';
 import { getImageUrl } from '@/lib/images';
 import { formatPrice } from '@/lib/format';
 
 const navLinks = [
-  { href: '/products', label: 'Shop All' },
+  { href: '/products', label: 'The Collection' },
   { href: '/categories/chips', label: 'Chips' },
   { href: '/categories/mixtures', label: 'Mixtures' },
   { href: '/categories/murukku', label: 'Murukku' },
   { href: '/categories/sweets', label: 'Sweets' },
+  { href: '/batch-specials', label: 'Batch Specials' },
 ];
 
 export default function Header() {
     const { user, isAuthenticated } = useAuth();
+    const { openCart, itemCount } = useCart();
     const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -86,7 +89,7 @@ export default function Header() {
         <div className="sticky top-0 z-50 flex flex-col w-full">
             {/* Announcement Bar — one message, all breakpoints */}
             <div className="w-full bg-gradient-to-r from-red-700 via-red-600 to-amber-600 text-white text-xs sm:text-sm font-medium py-2 px-4 text-center">
-                Free delivery on orders over ₹500 · Cash on Delivery
+                Fresh Batches Every Morning · Free Express Shipping over ₹750 · 30-Day Crispness Guarantee
             </div>
 
             <header className={`[transition-property:background-color,border-color,box-shadow] duration-300 ease-out ${scrolled ? 'glass shadow-lg' : 'bg-white/95 border-b border-stone-200'}`}>
@@ -237,6 +240,23 @@ export default function Header() {
                             </div>
                         </div>
 
+
+                        {/* Cart Drawer Trigger */}
+                        <button
+                            id="header-cart-trigger"
+                            onClick={openCart}
+                            className="relative flex p-2.5 rounded-full text-stone-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-150 cursor-pointer active:scale-95"
+                            aria-label={`Artisanal tasting vault (${itemCount} items)`}
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                            </svg>
+                            {itemCount > 0 && (
+                                <span className="absolute top-1 right-1 flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold bg-red-600 text-white shadow-xs">
+                                    {itemCount}
+                                </span>
+                            )}
+                        </button>
 
                         {/* Mobile Menu Toggle */}
                         <button
