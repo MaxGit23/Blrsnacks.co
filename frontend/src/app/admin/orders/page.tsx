@@ -163,7 +163,7 @@ function OrdersContent() {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4 text-right font-semibold text-text-primary">{formatPrice(order.totalAmount)}</td>
+                                        <td className="py-3 px-4 text-right font-semibold text-text-primary">{/* PRICE HIDDEN {formatPrice(order.totalAmount)} */}</td>
                                         <td className="py-3 px-4 text-center">
                                             <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
                                         </td>
@@ -189,7 +189,7 @@ function OrdersContent() {
                                             <span className="text-xs font-mono text-text-primary font-medium">#{order.id.slice(4, 10).toUpperCase()}</span>
                                             <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
                                         </div>
-                                        <span className="text-sm font-bold text-text-primary">{formatPrice(order.totalAmount)}</span>
+                                        {/* PRICE HIDDEN <span className="text-sm font-bold text-text-primary">{formatPrice(order.totalAmount)}</span> */}
                                     </div>
                                     <div className="text-xs text-text-tertiary mb-3">
                                         {order.user?.email} · {formatDate(order.createdAt)}
@@ -232,7 +232,7 @@ function OrdersContent() {
                                 #{selectedOrder.id.slice(4, 12).toUpperCase()}
                             </div>
                             <div className="text-xs text-text-tertiary mt-1">
-                                {selectedOrder.user?.email} · {formatPrice(selectedOrder.totalAmount)}
+                                {selectedOrder.user?.email} {/* PRICE HIDDEN · {formatPrice(selectedOrder.totalAmount)} */}
                             </div>
                         </div>
 

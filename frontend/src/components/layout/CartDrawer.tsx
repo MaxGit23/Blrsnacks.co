@@ -111,7 +111,7 @@ export function CartDrawer() {
                     <div className="flex items-center justify-between text-xs font-medium mb-1.5">
                         {amountNeeded > 0 ? (
                             <span className="text-stone-800">
-                                Add <strong className="text-red-700 font-bold">{formatPrice(amountNeeded)}</strong> more for <span className="font-semibold text-stone-900">Free Express Shipping</span>
+                                Add {/* PRICE HIDDEN <strong className="text-red-700 font-bold">{formatPrice(amountNeeded)}</strong> */} more for <span className="font-semibold text-stone-900">Free Express Shipping</span>
                             </span>
                         ) : (
                             <span className="text-emerald-700 font-bold flex items-center gap-1">
@@ -224,9 +224,11 @@ export function CartDrawer() {
                                                     </button>
                                                 </div>
 
+                                                {/* PRICE HIDDEN
                                                 <span className="text-xs font-bold text-stone-900 font-display">
                                                     {formatPrice(itemTotal)}
                                                 </span>
+                                                */}
                                             </div>
                                         </div>
                                     </div>
@@ -259,9 +261,11 @@ export function CartDrawer() {
                                                 <p className="text-xs font-semibold text-stone-900 truncate">
                                                     {item.name}
                                                 </p>
+                                                {/* PRICE HIDDEN
                                                 <p className="text-[11px] text-stone-500 font-medium">
                                                     {formatPrice(item.price)}
                                                 </p>
+                                                */}
                                             </div>
                                         </div>
 
@@ -284,9 +288,11 @@ export function CartDrawer() {
                     <div className="p-4 sm:p-5 border-t border-stone-200 bg-stone-50/70 space-y-3">
                         <div className="flex items-center justify-between text-sm">
                             <span className="text-stone-600 font-medium">Subtotal</span>
+                            {/* PRICE HIDDEN
                             <span className="text-base font-extrabold text-stone-900 font-display">
                                 {formatPrice(total)}
                             </span>
+                            */}
                         </div>
 
                         <div className="flex items-center justify-between text-xs text-stone-500">

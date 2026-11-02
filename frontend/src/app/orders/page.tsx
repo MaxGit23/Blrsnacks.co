@@ -147,7 +147,7 @@ export default function OrdersPage() {
                                 </div>
                                 <div className="flex items-center gap-4 text-xs text-text-tertiary">
                                     <span>{formatDate(order.createdAt)}</span>
-                                    <span className="font-semibold text-text-primary text-sm">{formatPrice(Number(order.totalAmount))}</span>
+                                    {/* PRICE HIDDEN <span className="font-semibold text-text-primary text-sm">{formatPrice(Number(order.totalAmount))}</span> */}
                                 </div>
                             </div>
 

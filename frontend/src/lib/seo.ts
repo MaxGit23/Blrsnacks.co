@@ -61,8 +61,10 @@ export function generateProductSeo(product: {
             image: product.images[0],
         }),
         other: {
+            /* PRICE HIDDEN
             'product:price:amount': String(product.price),
             'product:price:currency': 'INR',
+            */
         },
     };
 }

@@ -73,7 +73,7 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
                     { label: 'Total Orders', value: DEMO_STATS.totalOrders, icon: '🧾', href: '/admin/orders' },
-                    { label: 'Revenue', value: formatPrice(DEMO_STATS.totalRevenue), icon: '💰', href: '/admin/orders' },
+                    { label: 'Revenue', value: '—' /* PRICE HIDDEN: formatPrice(DEMO_STATS.totalRevenue) */, icon: '💰', href: '/admin/orders' },
                     { label: 'Products', value: DEMO_STATS.totalProducts, icon: '🍌', href: '/admin/products' },
                     { label: 'Customers', value: DEMO_STATS.totalCustomers, icon: '👥', href: '/admin/customers' },
                 ].map(({ label, value, icon, href }) => (
@@ -123,7 +123,7 @@ export default function AdminDashboardPage() {
                                 </div>
                                 <div className="flex items-center gap-3 shrink-0">
                                     <span className="text-xs text-text-tertiary">{formatDate(order.createdAt)}</span>
-                                    <span className="text-sm font-semibold text-text-primary">{formatPrice(order.totalAmount)}</span>
+                                    {/* PRICE HIDDEN <span className="text-sm font-semibold text-text-primary">{formatPrice(order.totalAmount)}</span> */}
                                 </div>
                             </Link>
                         ))}
@@ -148,7 +148,7 @@ export default function AdminDashboardPage() {
                                 >
                                     <div className="min-w-0">
                                         <div className="text-sm font-medium text-text-primary truncate">{item.product.name}</div>
-                                        <div className="text-xs text-text-tertiary">{formatPrice(item.product.price)}</div>
+                                        {/* PRICE HIDDEN <div className="text-xs text-text-tertiary">{formatPrice(item.product.price)}</div> */}
                                     </div>
                                     <div className="shrink-0">
                                         <Badge variant={available <= 0 ? 'error' : 'warning'}>

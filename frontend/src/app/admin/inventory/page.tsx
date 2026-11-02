@@ -165,7 +165,7 @@ export default function AdminInventoryPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-semibold text-text-primary truncate">{item.product.name}</div>
-                                            <div className="text-xs text-text-tertiary">{formatPrice(item.product.price)}</div>
+                                            {/* PRICE HIDDEN <div className="text-xs text-text-tertiary">{formatPrice(item.product.price)}</div> */}
                                         </div>
                                         <div className="flex items-center gap-3 shrink-0">
                                             <div className="text-right">
@@ -229,7 +229,7 @@ export default function AdminInventoryPage() {
                                                         <span className="font-medium text-text-primary truncate">{product.name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="py-3 px-4 text-right text-text-secondary">{formatPrice(product.price)}</td>
+                                                <td className="py-3 px-4 text-right text-text-secondary">{/* PRICE HIDDEN {formatPrice(product.price)} */}</td>
                                                 <td className="py-3 px-4 text-center font-medium">{total}</td>
                                                 <td className="py-3 px-4 text-center text-text-tertiary">{reserved}</td>
                                                 <td className="py-3 px-4 text-center">

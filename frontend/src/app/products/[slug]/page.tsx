@@ -211,7 +211,7 @@ export default function ProductDetailPage() {
                         </p>
                     </div>
 
-                    {/* Price & Unit Economics */}
+                    {/* PRICE HIDDEN
                     <div className="p-4 rounded-xl bg-stone-50 border border-stone-200/80 flex items-baseline justify-between gap-4">
                         <div>
                             <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider block mb-1">
@@ -239,6 +239,7 @@ export default function ProductDetailPage() {
                             </span>
                         </div>
                     </div>
+                    */}
 
                     {/* Weight Selection & Multi-Pack Volume Tiering */}
                     {variants && variants.length > 0 && (
@@ -281,12 +282,14 @@ export default function ProductDetailPage() {
                                             <div className="font-bold text-sm">
                                                 {v.label}
                                             </div>
+                                            {/* PRICE HIDDEN
                                             <div className={`text-xs mt-1 font-semibold ${isActive ? 'text-amber-300' : 'text-red-700'}`}>
                                                 {formatPrice(v.price)}
                                             </div>
                                             <div className={`text-[10px] mt-0.5 ${isActive ? 'text-stone-300' : 'text-stone-400'}`}>
                                                 {formatPrice(Number(unitPrice.toFixed(1)))}/100g
                                             </div>
+                                            */}
                                         </button>
                                     );
                                 })}
@@ -330,7 +333,7 @@ export default function ProductDetailPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                             </svg>
                             <span>Add to Tasting Vault</span>
-                            <span className="font-semibold text-white/90">· {formatPrice(activePrice * quantity)}</span>
+                            {/* PRICE HIDDEN <span className="font-semibold text-white/90">· {formatPrice(activePrice * quantity)}</span> */}
                         </button>
                     </div>
 

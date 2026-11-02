@@ -16,6 +16,7 @@
 *   Need to ensure Inventory reservation logic correctly ties in with the Order lifecycle.
 
 ## Recent Changes
+*   **MOTION AI KIT INSTALLED**: Configured Motion AI Kit (`motion` animation skill & hosted MCP servers `motion` and `motion-plus`) for project agents (.agents, .gemini, .claude, .codex).
 *   **PREMIUM BRAND REFACTOR — COMPLETE (All 4 CRO Pillars & Phases 1-6)**:
     *   **Pillar 1: Brand Messaging & Anti-Positioning (Phase 1)**:
         *   Hero rewrite: "Not Another Snack Store." + "Small-batch South Indian craft."
@@ -58,6 +59,7 @@
 *   **DEMO CATALOGUE EXPANDED**: Added 3 new static products with local images — **Benne Butter Murukku** (200g/₹35, 400g/₹65), **Bakarwadi** (200g/₹40, 400g/₹75), **Spicy Nendran Chips** (200g/₹25, 400g/₹48, 500g/₹55). Renamed uploaded images to web-safe filenames (`benne-murukku.jpg`, `bakarwadi.jpeg`, `banana-chips-extra.jpg`). Classic Banana Chips now has a second gallery image (`banana-chips-extra.jpg`) showing as thumbnails on its detail page. Total: 4 products across 3 categories.
 *   **DEMO CATALOGUE EXPANDED (2nd batch)**: Added 11 more static products with local images — **Masala Moong Dal**, **Kerala Spicy Mixture**, **Plain Moong Dal**, **Fried Peanuts**, **Ribbon Mixture**, **Special Mixture** (Mixtures); **Yellow Masala Murukku**, **Kodubale** (Murukku); **Congress Kadlekai**, **Masala Peanuts**, **Kara Boondi** (Mixtures). All with 200g/400g weight variants and web-safe filenames. Total: 15 products across 3 categories (Banana Chips, Mixtures, Murukku).
 *   Backend currently NOT runnable — Supabase project `bqxnllqfjcukvfpcocfh` appears paused/deleted ("tenant not found"). Backend source left intact for future restore. Frontend runs standalone on port 3002.
+*   **ALL PRICES COMMENTED OUT**: Every `formatPrice()` render and price-related JSX across the entire frontend has been wrapped in `{/* PRICE HIDDEN … */}` comments. Affected files: `ProductCard.tsx`, `[slug]/page.tsx` (PDP), `CuratedVaults.tsx`, `CartDrawer.tsx`, `cart/page.tsx`, `account/page.tsx`, `orders/page.tsx`, `admin/page.tsx`, `admin/orders/page.tsx`, `admin/products/page.tsx`, `admin/inventory/page.tsx`, `lib/seo.ts`. Data model, `formatPrice` utility, and `mock-products.ts` prices are **unchanged** — only the JSX rendering is suppressed. Search for `PRICE HIDDEN` to find and restore all locations. `tsc --noEmit` passes clean.
 
 ## Next Recommended Steps
 *   **Premium Refactor Phase 2**: Enrich `DemoProduct` type with `artisanTags`, `ingredients`, `shelfLife`, `certifications`, `pairingTip`, `storageTip`, `spiceLevel`. Un-comment weight selector + price on ProductCard and PDP. Add efficacy badges and storage/pairing cards.

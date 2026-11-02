@@ -113,9 +113,11 @@ export function CuratedVaults() {
                                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
                                         {bundle.badge}
                                     </span>
+                                    {/* PRICE HIDDEN
                                     <span className="text-xs font-semibold text-emerald-400">
                                         {bundle.highlight}
                                     </span>
+                                    */}
                                 </div>
 
                                 <h3 className="text-xl sm:text-2xl font-bold font-display text-white mb-1">
@@ -146,6 +148,7 @@ export function CuratedVaults() {
 
                             {/* Price & CTA */}
                             <div className="pt-6 border-t border-stone-800">
+                                {/* PRICE HIDDEN
                                 <div className="flex items-baseline justify-between mb-4">
                                     <div>
                                         <div className="flex items-baseline gap-2">
@@ -164,6 +167,7 @@ export function CuratedVaults() {
                                         Ships Free in BLR
                                     </span>
                                 </div>
+                                */}
 
                                 <button
                                     type="button"

@@ -82,7 +82,7 @@ export default function AccountPage() {
                     <div className="text-sm text-text-secondary mt-1">Total Orders</div>
                 </Card>
                 <Card className="text-center">
-                    <div className="text-3xl font-bold text-brand-primary">{formatPrice(orderStats.totalSpent)}</div>
+                    {/* PRICE HIDDEN <div className="text-3xl font-bold text-brand-primary">{formatPrice(orderStats.totalSpent)}</div> */}
                     <div className="text-sm text-text-secondary mt-1">Total Spent</div>
                 </Card>
                 <Card className="text-center">
@@ -193,7 +193,7 @@ export default function AccountPage() {
                                             </p>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <span className="text-sm font-bold text-text-primary">{formatPrice(Number(order.totalAmount))}</span>
+                                            {/* PRICE HIDDEN <span className="text-sm font-bold text-text-primary">{formatPrice(Number(order.totalAmount))}</span> */}
                                         </div>
                                     </div>
                                 </Card>

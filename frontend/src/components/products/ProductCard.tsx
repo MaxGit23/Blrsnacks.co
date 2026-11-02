@@ -84,6 +84,7 @@ export function ProductCard({ product }: { product: Product }) {
                 {/* Bottom Section: Weight options & Price */}
                 <div className="px-4 pb-4 pt-1 border-t border-stone-100 bg-stone-50/50">
                     <div className="flex items-center justify-between gap-2">
+                        {/* PRICE HIDDEN
                         <div>
                             <span className="text-[10px] uppercase font-semibold text-stone-400 tracking-wider block">
                                 {variants && variants.length > 1 ? 'Starting from' : 'Price'}
@@ -99,6 +100,7 @@ export function ProductCard({ product }: { product: Product }) {
                                 )}
                             </div>
                         </div>
+                        */}
 
                         {/* Weight Variants Pill selector */}
                         {variants && variants.length > 1 && (
@@ -139,7 +141,7 @@ export function ProductCard({ product }: { product: Product }) {
                         className="mt-2.5 w-full py-2 px-3 rounded-lg bg-stone-900 hover:bg-red-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors duration-150 active:scale-[0.98]"
                     >
                         <span>+ Add to Tasting Vault</span>
-                        <span className="text-stone-300 font-normal">({formatPrice(priceToDisplay)})</span>
+                        {/* PRICE HIDDEN <span className="text-stone-300 font-normal">({formatPrice(priceToDisplay)})</span> */}
                     </button>
                 </div>
             </Card>

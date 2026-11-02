@@ -324,7 +324,7 @@ export default function AdminProductsPage() {
                                                 </div>
                                             </td>
                                             <td className="py-3 px-4 text-text-secondary">{product.category?.name ?? '—'}</td>
-                                            <td className="py-3 px-4 text-right font-semibold text-text-primary">{formatPrice(product.price)}</td>
+                                            <td className="py-3 px-4 text-right font-semibold text-text-primary">{/* PRICE HIDDEN {formatPrice(product.price)} */}</td>
                                             <td className="py-3 px-4 text-center">
                                                 <Badge variant={product.isPublished ? 'success' : 'default'}>
                                                     {product.isPublished ? 'Published' : 'Draft'}
@@ -372,7 +372,7 @@ export default function AdminProductsPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-semibold text-text-primary truncate">{product.name}</div>
-                                            <div className="text-xs text-text-tertiary mt-0.5">{product.category?.name} · {formatPrice(product.price)}</div>
+                                            <div className="text-xs text-text-tertiary mt-0.5">{product.category?.name} {/* PRICE HIDDEN · {formatPrice(product.price)} */}</div>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <Badge variant={product.isPublished ? 'success' : 'default'}>
                                                     {product.isPublished ? 'Published' : 'Draft'}

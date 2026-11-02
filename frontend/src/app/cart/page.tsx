@@ -112,9 +112,11 @@ export default function CartPage() {
                                         >
                                             {item.product.name}
                                         </Link>
+                                        {/* PRICE HIDDEN
                                         <div className="text-lg font-bold text-red-600 mt-1">
                                             {formatPrice(Number(item.product.price))}
                                         </div>
+                                        */}
 
                                         {/* Quantity controls */}
                                         <div className="flex items-center gap-4 mt-3">
@@ -153,9 +155,11 @@ export default function CartPage() {
 
                                     {/* Line total */}
                                     <div className="text-right shrink-0">
+                                        {/* PRICE HIDDEN
                                         <span className="text-base font-bold text-slate-900">
                                             {formatPrice(Number(item.product.price) * item.quantity)}
                                         </span>
+                                        */}
                                     </div>
                                 </div>
                             </Card>
@@ -176,12 +180,12 @@ export default function CartPage() {
                             <div className="space-y-4">
                                 <div className="flex justify-between text-slate-600">
                                     <span>Subtotal ({itemCount} items)</span>
-                                    <span className="font-medium text-slate-900">{formatPrice(total)}</span>
+                                    <span>{/* PRICE HIDDEN {formatPrice(total)} */}</span>
                                 </div>
                                 <div className="flex justify-between text-slate-600">
                                     <span>Delivery</span>
                                     <span className={`font-medium ${deliveryFee === 0 ? 'text-green-600' : 'text-slate-900'}`}>
-                                        {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
+                                        {deliveryFee === 0 ? 'FREE' : '—' /* PRICE HIDDEN: formatPrice(deliveryFee) */}
                                     </span>
                                 </div>
                                 {deliveryFee === 0 && (
@@ -193,7 +197,7 @@ export default function CartPage() {
                                 <div className="border-t border-slate-200 pt-4 flex justify-between items-center">
                                     <span className="font-semibold text-slate-900">Total</span>
                                     <span className="text-2xl font-bold text-red-600" id="cart-total">
-                                        {formatPrice(grandTotal)}
+                                        {/* PRICE HIDDEN {formatPrice(grandTotal)} */}
                                     </span>
                                 </div>
                             </div>
@@ -201,7 +205,7 @@ export default function CartPage() {
                             {total < 500 && (
                                 <div className="mt-4 px-4 py-3 bg-red-50 text-red-700 text-sm rounded-xl flex items-center gap-2">
                                     <span>🎁</span>
-                                    Add {formatPrice(500 - total)} more for free delivery!
+                                    Add {/* PRICE HIDDEN {formatPrice(500 - total)} */} more for free delivery!
                                 </div>
                             )}
 
